@@ -11,4 +11,4 @@ class NotFound extends CustomError{
 
 }
 
-export=NotFound
+export default NotFound

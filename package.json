@@ -4,12 +4,12 @@
   "description": "Cloud backup system",
   "main": "index.js",
   "scripts": {
-    "build": "rimraf dist && npx tsc && tsconfig.build.json",
+    "build": "rimraf dist && npx tsc",
     "prestart": "npm run build",
     "start": "node dist/app.js",
     "dev": "concurrently -k \"npx tsc -w\" \"nodemon dist/app.js\"",
-    "test": "jest -c ./jest.unit.json",
-    "test:coverage": "jest --coverage -c ./jest.unit.json"
+    "test": "jest -c ./jest.unit.json"
+    
   },
   "keywords": [],
   "author": "Tosibinaronmuro Jegede",

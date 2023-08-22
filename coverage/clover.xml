@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1692695486264" clover="3.2.0">
-  <project timestamp="1692695486264" name="All files">
-    <metrics statements="212" coveredstatements="4" conditionals="379" coveredconditionals="0" methods="74" coveredmethods="0" elements="665" coveredelements="4" complexity="0" loc="212" ncloc="212" packages="7" files="20" classes="20"/>
+<coverage generated="1692698398193" clover="3.2.0">
+  <project timestamp="1692698398194" name="All files">
+    <metrics statements="204" coveredstatements="4" conditionals="368" coveredconditionals="0" methods="71" coveredmethods="0" elements="643" coveredelements="4" complexity="0" loc="204" ncloc="204" packages="7" files="20" classes="20"/>
     <package name="Rise">
-      <metrics statements="10" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="3" coveredmethods="0"/>
+      <metrics statements="9" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="2" coveredmethods="0"/>
       <file name="app.ts" path="C:\Users\tosiron\Documents\Rise\app.ts">
         <metrics statements="7" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="2" coveredmethods="0"/>
         <line num="2" count="0" type="stmt"/>
@@ -18,10 +18,6 @@
         <metrics statements="2" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="3" count="0" type="stmt"/>
         <line num="27" count="0" type="stmt"/>
-      </file>
-      <file name="testing.ts" path="C:\Users\tosiron\Documents\Rise\testing.ts">
-        <metrics statements="1" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
       </file>
     </package>
     <package name="Rise.config">
@@ -165,7 +161,7 @@
       </file>
     </package>
     <package name="Rise.dist">
-      <metrics statements="10" coveredstatements="0" conditionals="9" coveredconditionals="0" methods="3" coveredmethods="0"/>
+      <metrics statements="13" coveredstatements="0" conditionals="9" coveredconditionals="0" methods="3" coveredmethods="0"/>
       <file name="app.js" path="C:\Users\tosiron\Documents\Rise\dist\app.js">
         <metrics statements="10" coveredstatements="0" conditionals="9" coveredconditionals="0" methods="3" coveredmethods="0"/>
         <line num="2" count="0" type="cond" truecount="0" falsecount="3"/>
@@ -179,25 +175,22 @@
         <line num="12" count="0" type="stmt"/>
         <line num="13" count="0" type="stmt"/>
       </file>
+      <file name="jest.config.js" path="C:\Users\tosiron\Documents\Rise\dist\jest.config.js">
+        <metrics statements="3" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="2" count="0" type="stmt"/>
+        <line num="3" count="0" type="stmt"/>
+        <line num="26" count="0" type="stmt"/>
+      </file>
     </package>
     <package name="Rise.dist.config">
-      <metrics statements="11" coveredstatements="0" conditionals="11" coveredconditionals="0" methods="2" coveredmethods="0"/>
+      <metrics statements="2" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
       <file name="allowedOrigins.js" path="C:\Users\tosiron\Documents\Rise\dist\config\allowedOrigins.js">
         <metrics statements="2" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="2" count="0" type="stmt"/>
         <line num="5" count="0" type="stmt"/>
       </file>
       <file name="corsOptions.js" path="C:\Users\tosiron\Documents\Rise\dist\config\corsOptions.js">
-        <metrics statements="9" coveredstatements="0" conditionals="11" coveredconditionals="0" methods="2" coveredmethods="0"/>
-        <line num="2" count="0" type="cond" truecount="0" falsecount="3"/>
-        <line num="3" count="0" type="cond" truecount="0" falsecount="4"/>
-        <line num="5" count="0" type="stmt"/>
-        <line num="6" count="0" type="stmt"/>
-        <line num="7" count="0" type="stmt"/>
-        <line num="9" count="0" type="cond" truecount="0" falsecount="4"/>
-        <line num="10" count="0" type="stmt"/>
-        <line num="13" count="0" type="stmt"/>
-        <line num="19" count="0" type="stmt"/>
+        <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
       </file>
     </package>
     <package name="Rise.dist.errors">
@@ -255,15 +248,14 @@
       </file>
     </package>
     <package name="Rise.errors">
-      <metrics statements="23" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="4" coveredmethods="0"/>
+      <metrics statements="22" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="4" coveredmethods="0"/>
       <file name="bad-request.ts" path="C:\Users\tosiron\Documents\Rise\errors\bad-request.ts">
-        <metrics statements="6" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
-        <line num="1" count="1" type="stmt"/>
-        <line num="2" count="1" type="stmt"/>
+        <metrics statements="5" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
+        <line num="1" count="0" type="stmt"/>
+        <line num="2" count="0" type="stmt"/>
         <line num="8" count="0" type="stmt"/>
         <line num="9" count="0" type="stmt"/>
-        <line num="10" count="0" type="stmt"/>
-        <line num="14" count="1" type="stmt"/>
+        <line num="13" count="0" type="stmt"/>
       </file>
       <file name="custom-error.ts" path="C:\Users\tosiron\Documents\Rise\errors\custom-error.ts">
         <metrics statements="2" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
@@ -279,12 +271,12 @@
         <line num="6" count="0" type="stmt"/>
       </file>
       <file name="not-found.ts" path="C:\Users\tosiron\Documents\Rise\errors\not-found.ts">
-        <metrics statements="5" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="2" count="0" type="stmt"/>
+        <metrics statements="5" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="1" type="stmt"/>
         <line num="8" count="0" type="stmt"/>
         <line num="9" count="0" type="stmt"/>
-        <line num="14" count="0" type="stmt"/>
+        <line num="14" count="1" type="stmt"/>
       </file>
       <file name="unauthenticated.ts" path="C:\Users\tosiron\Documents\Rise\errors\unauthenticated.ts">
         <metrics statements="5" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>

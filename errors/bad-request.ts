@@ -6,8 +6,7 @@ class BadRequest extends CustomError {
 
   constructor(message: string) {
     super(message);
-    this.message = message;  
-    this.status = StatusCodes.BAD_REQUEST;
+    this.status = StatusCodes.BAD_REQUEST;  
   }
 }
 

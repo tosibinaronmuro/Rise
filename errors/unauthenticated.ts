@@ -10,4 +10,4 @@ class Unauthenticated extends CustomError {
   }
 }
 
-export = Unauthenticated;
+export default Unauthenticated;
