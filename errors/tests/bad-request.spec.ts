@@ -7,7 +7,7 @@ describe("BadRequest class", () => {
     const badRequest = new BadRequest(message);
 
     expect(badRequest.message).toBe(message);
-    expect(badRequest.status).toBe(400);
+    expect(badRequest.status).toBe(StatusCodes.BAD_REQUEST);
     expect(badRequest instanceof BadRequest).toBe(true);  
   });
 
