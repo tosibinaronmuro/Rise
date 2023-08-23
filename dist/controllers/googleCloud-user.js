@@ -151,11 +151,13 @@ const deleteFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         const file = risecloudBucket.file(fileName);
         // TODO: Implement authorization logic here to check if the user is allowed to delete the file
         file.delete();
-        return res.status(200).json({ message: 'File deleted successfully' });
+        return res.status(200).json({ message: "File deleted successfully" });
     }
     catch (error) {
         console.error(error);
-        return res.status(500).json({ message: 'An error occurred while deleting the file' });
+        return res
+            .status(500)
+            .json({ message: "An error occurred while deleting the file" });
     }
 });
 exports.deleteFile = deleteFile;
@@ -163,27 +165,35 @@ const deleteFolder = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     try {
         const folderName = req.params.folderName;
         // TODO: Implement authorization logic here to check if the user is allowed to delete the folder
-        const [files] = yield risecloudBucket.getFiles({ prefix: `${folderName}/` });
+        const [files] = yield risecloudBucket.getFiles({
+            prefix: `${folderName}/`,
+        });
         for (const file of files) {
             yield file.delete();
         }
-        return res.status(200).json({ message: 'Folder and its contents deleted successfully' });
+        return res
+            .status(200)
+            .json({ message: "Folder and its contents deleted successfully" });
     }
     catch (error) {
         console.error(error);
-        return res.status(500).json({ message: 'An error occurred while deleting the folder' });
+        return res
+            .status(500)
+            .json({ message: "An error occurred while deleting the folder" });
     }
 });
 exports.deleteFolder = deleteFolder;
 const getAllFiles = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const [files] = yield risecloudBucket.getFiles();
-        const fileNames = files.map(file => file.name);
+        const fileNames = files.map((file) => file.name);
         return res.status(200).json({ files: fileNames });
     }
     catch (error) {
         console.error(error);
-        return res.status(500).json({ message: 'An error occurred while fetching files' });
+        return res
+            .status(500)
+            .json({ message: "An error occurred while fetching files" });
     }
 });
 exports.getAllFiles = getAllFiles;

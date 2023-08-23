@@ -147,52 +147,69 @@ const createFolder = async (req: Request, res: Response) => {
   }
 };
 const deleteFile = async (req: Request, res: Response) => {
-    try {
-      const fileName = req.params.fileName;
-  
-      const file = risecloudBucket.file(fileName);
-  
-      // TODO: Implement authorization logic here to check if the user is allowed to delete the file
-  
-      file.delete();
-  
-      return res.status(200).json({ message: 'File deleted successfully' });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'An error occurred while deleting the file' });
-    }
-  };
-  
-  const deleteFolder = async (req: Request, res: Response) => {
-    try {
-      const folderName = req.params.folderName;
-  
-      // TODO: Implement authorization logic here to check if the user is allowed to delete the folder
-  
-      const [files] = await risecloudBucket.getFiles({ prefix: `${folderName}/` });
-  
-      for (const file of files) {
-        await file.delete();
-      }
-  
-      return res.status(200).json({ message: 'Folder and its contents deleted successfully' });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'An error occurred while deleting the folder' });
-    }
-  };
+  try {
+    const fileName = req.params.fileName;
 
-  const getAllFiles = async (req: Request, res: Response) => {
-    try {
-      const [files] = await risecloudBucket.getFiles();
-  
-      const fileNames = files.map(file => file.name);
-  
-      return res.status(200).json({ files: fileNames });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'An error occurred while fetching files' });
-    }
-  };
+    const file = risecloudBucket.file(fileName);
 
-export { uploadFile, downloadFile, createFolder, deleteFolder,deleteFile ,getAllFiles};
+    // TODO: Implement authorization logic here to check if the user is allowed to delete the file
+
+    file.delete();
+
+    return res.status(200).json({ message: "File deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "An error occurred while deleting the file" });
+  }
+};
+
+const deleteFolder = async (req: Request, res: Response) => {
+  try {
+    const folderName = req.params.folderName;
+
+    // TODO: Implement authorization logic here to check if the user is allowed to delete the folder
+
+    const [files] = await risecloudBucket.getFiles({
+      prefix: `${folderName}/`,
+    });
+
+    for (const file of files) {
+      await file.delete();
+    }
+
+    return res
+      .status(200)
+      .json({ message: "Folder and its contents deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "An error occurred while deleting the folder" });
+  }
+};
+
+const getAllFiles = async (req: Request, res: Response) => {
+  try {
+    const [files] = await risecloudBucket.getFiles();
+
+    const fileNames = files.map((file) => file.name);
+
+    return res.status(200).json({ files: fileNames });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "An error occurred while fetching files" });
+  }
+};
+
+export {
+  uploadFile,
+  downloadFile,
+  createFolder,
+  deleteFolder,
+  deleteFile,
+  getAllFiles,
+};
