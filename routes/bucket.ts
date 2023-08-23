@@ -1,5 +1,5 @@
 import express from 'express';
-import { uploadFile, downloadFile, deleteFile, deleteFolder,createFolder, getAllFiles } from '../controllers/googleCloud';
+import { uploadFile, downloadFile, deleteFile, deleteFolder,createFolder, getAllFiles } from '../controllers/googleCloud-user';
 
 import multer from 'multer';
 const storage = multer.memoryStorage();
