@@ -9,4 +9,6 @@ const router = express_1.default.Router();
 router.route('/register').post(auth_1.register);
 router.route('/login').post(auth_1.login);
 router.get('/logout', auth_1.logout);
+router.post("/forgot-password", auth_1.forgotPassword);
+router.post("/reset-password", auth_1.resetPassword);
 exports.default = router;

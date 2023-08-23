@@ -12,16 +12,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.logout = exports.login = exports.register = void 0;
+exports.resetPassword = exports.forgotPassword = exports.logout = exports.login = exports.register = void 0;
 const express_1 = __importDefault(require("express"));
 const http_status_codes_1 = require("http-status-codes");
 const errors_1 = require("../errors");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dbConfig_1 = __importDefault(require("../dbConfig"));
+const helper_1 = require("../utils/helper");
 const router = express_1.default.Router();
-const secretKey = process.env.JWT_SECRET || '';
-;
+const secretKey = process.env.JWT_SECRET || "";
 const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { fullname, email, password } = req.body;
@@ -31,25 +31,25 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const hashedPassword = yield bcryptjs_1.default.hash(password, 10);
         const client = yield dbConfig_1.default.connect();
         try {
-            yield client.query('BEGIN');
-            const emailExistsQuery = 'SELECT * FROM users WHERE email = $1';
+            yield client.query("BEGIN");
+            const emailExistsQuery = "SELECT * FROM users WHERE email = $1";
             const emailExistsResult = yield client.query(emailExistsQuery, [email]);
             if (emailExistsResult.rows.length > 0) {
                 throw new errors_1.BadRequest("Email already exists");
             }
-            const insertUserQuery = 'INSERT INTO users (fullname, email, password) VALUES ($1, $2, $3) RETURNING id';
+            const insertUserQuery = "INSERT INTO users (fullname, email, password) VALUES ($1, $2, $3) RETURNING id";
             const insertUserResult = yield client.query(insertUserQuery, [
                 fullname,
                 email,
                 hashedPassword,
             ]);
-            console.log('Registration successful');
-            yield client.query('COMMIT');
+            console.log("Registration successful");
+            yield client.query("COMMIT");
             const token = jsonwebtoken_1.default.sign({ userId: insertUserResult.rows[0].id }, secretKey);
-            res.status(201).json({ message: 'Registration successful', token });
+            res.status(201).json({ message: "Registration successful", token });
         }
         catch (error) {
-            yield client.query('ROLLBACK');
+            yield client.query("ROLLBACK");
             throw error;
         }
         finally {
@@ -58,7 +58,9 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
     catch (error) {
         console.error(error);
-        res.status(error.status || 500).json({ message: error.message || 'An error occurred' });
+        res
+            .status(error.status || 500)
+            .json({ message: error.message || "An error occurred" });
     }
 });
 exports.register = register;
@@ -70,7 +72,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
         const client = yield dbConfig_1.default.connect();
         try {
-            const userQuery = 'SELECT * FROM users WHERE email = $1';
+            const userQuery = "SELECT * FROM users WHERE email = $1";
             const userResult = yield client.query(userQuery, [email]);
             if (userResult.rows.length === 0) {
                 throw new errors_1.BadRequest("User not found");
@@ -81,7 +83,9 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 throw new errors_1.BadRequest("Invalid password");
             }
             const token = jsonwebtoken_1.default.sign({ userId: user.id }, secretKey);
-            res.status(200).json({ message: 'Login successful', username: user.fullname, token });
+            res
+                .status(200)
+                .json({ message: "Login successful", username: user.fullname, token });
         }
         catch (error) {
             throw error;
@@ -92,7 +96,9 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
     catch (error) {
         console.error(error);
-        res.status(error.status || 500).json({ message: error.message || 'An error occurred' });
+        res
+            .status(error.status || 500)
+            .json({ message: error.message || "An error occurred" });
     }
 });
 exports.login = login;
@@ -100,3 +106,89 @@ const logout = (req, res) => {
     res.status(http_status_codes_1.StatusCodes.OK).send("logout");
 };
 exports.logout = logout;
+const forgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            throw new errors_1.BadRequest("Please provide an email address");
+        }
+        const client = yield dbConfig_1.default.connect();
+        try {
+            const userQuery = "SELECT * FROM users WHERE email = $1";
+            const userResult = yield client.query(userQuery, [email]);
+            if (userResult.rows.length === 0) {
+                throw new errors_1.BadRequest("User not found");
+            }
+            const user = userResult.rows[0];
+            const resetToken = jsonwebtoken_1.default.sign({ userId: user.id }, secretKey, {
+                expiresIn: "1h",
+            });
+            const resetLink = `http://localhost:3000/reset-password/?token=${resetToken}`;
+            const mailConfigs = {
+                from: process.env.MY_EMAIL,
+                to: user.email,
+                subject: "Reset Password for Your App",
+                html: (0, helper_1.forgotPasswordEmailTemplate)(resetLink, user.fullname),
+            };
+            yield helper_1.mailTransport.sendMail(mailConfigs);
+            res
+                .status(200)
+                .json({ message: "Password reset link sent to your email" });
+        }
+        catch (error) {
+            throw error;
+        }
+        finally {
+            client.release();
+        }
+    }
+    catch (error) {
+        console.error(error);
+        res
+            .status(error.status || 500)
+            .json({ message: error.message || "An error occurred" });
+    }
+});
+exports.forgotPassword = forgotPassword;
+const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { token, password } = req.body;
+        if (!token || !password) {
+            throw new errors_1.BadRequest("Please provide token and new password");
+        }
+        const decodedToken = jsonwebtoken_1.default.verify(token, secretKey);
+        const userId = decodedToken.userId;
+        const loginLink = `http://localhost:3000/`;
+        const hashedPassword = yield bcryptjs_1.default.hash(password, 10);
+        const client = yield dbConfig_1.default.connect();
+        try {
+            const updateQuery = 'UPDATE users SET password = $1 WHERE id = $2';
+            yield client.query(updateQuery, [hashedPassword, userId]);
+            // Send confirmation email
+            const userQuery = 'SELECT * FROM users WHERE id = $1';
+            const userResult = yield client.query(userQuery, [userId]);
+            const user = userResult.rows[0];
+            const mailConfigs = {
+                from: process.env.MY_EMAIL,
+                to: user.email,
+                subject: "Password Change Confirmation",
+                html: (0, helper_1.resetPasswordEmailTemplate)(loginLink, user.fullname),
+            };
+            yield helper_1.mailTransport.sendMail(mailConfigs);
+            res.status(200).json({ message: "Password reset successful" });
+        }
+        catch (error) {
+            throw error;
+        }
+        finally {
+            client.release();
+        }
+    }
+    catch (error) {
+        console.error(error);
+        res
+            .status(error.status || 500)
+            .json({ message: error.message || "An error occurred" });
+    }
+});
+exports.resetPassword = resetPassword;
