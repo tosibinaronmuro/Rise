@@ -7,6 +7,9 @@ The RiseCloud Cloud Backup App API is a backend service that powers a cloud back
 ## Features
 
 - User Registration: Users can create accounts with their email address, password, and full name.
+- User login: Users can login to their accounts with their email address and password.
+- User forgot-password: Users can initiate a forgot password feature which sends an authentication token to their provided emails.
+- User reset-password: Users can reset their passwords by providing the authenticated token sent to their email and thereafter receive a confirmatory email.
 - Account Authentication: Users can log in securely using their registered credentials.
 - Secure Backup Storage: User files and data are securely stored in the cloud.
 - Account Management: Users can manage their account details, including password reset.
@@ -52,6 +55,10 @@ DB_DATABASE=your-db-name
 
 # JWT secret key
 SECRET_KEY=your-secret-key
+
+# Google client
+MY_PASSWORD=your-secret-key
+MY_EMAIL=your-semail
 ```
 
 5. Set up your PostgreSQL database with the provided configuration.
@@ -72,6 +79,9 @@ npm run start
 
 - `POST /api/v1/auth/register`: Register a new user account with email, password, and full name.
 - `POST /api/v1/auth/login`: Log in using email and password.
+- `POST /api/v1/auth/forgot-password`: provide email.
+- `POST /api/v1/auth/reset-password`: provide new password.
+
 - More endpoints  cominig soon
 
 ## Testing
