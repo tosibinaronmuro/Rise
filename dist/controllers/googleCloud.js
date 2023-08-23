@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteFile = exports.deleteFolder = exports.createFolder = exports.downloadFile = exports.uploadFile = void 0;
+exports.getAllFiles = exports.deleteFile = exports.deleteFolder = exports.createFolder = exports.downloadFile = exports.uploadFile = void 0;
 const storage_1 = require("@google-cloud/storage");
 const stream_1 = require("stream");
 const path_1 = __importDefault(require("path"));
@@ -175,3 +175,15 @@ const deleteFolder = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.deleteFolder = deleteFolder;
+const getAllFiles = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const [files] = yield risecloudBucket.getFiles();
+        const fileNames = files.map(file => file.name);
+        return res.status(200).json({ files: fileNames });
+    }
+    catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'An error occurred while fetching files' });
+    }
+});
+exports.getAllFiles = getAllFiles;

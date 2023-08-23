@@ -16,4 +16,5 @@ router.route('/download/:fileName').get(googleCloud_1.downloadFile);
 router.route('/download/:folderName/:fileName').get(googleCloud_1.downloadFile);
 router.route('/delete/:fileName').delete(googleCloud_1.deleteFile);
 router.route('/delete-folder/:folderName').delete(googleCloud_1.deleteFolder);
+router.route('/get-all-files').get(googleCloud_1.getAllFiles);
 exports.default = router;

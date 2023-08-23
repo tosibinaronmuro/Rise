@@ -182,4 +182,17 @@ const deleteFile = async (req: Request, res: Response) => {
     }
   };
 
-export { uploadFile, downloadFile, createFolder, deleteFolder,deleteFile };
+  const getAllFiles = async (req: Request, res: Response) => {
+    try {
+      const [files] = await risecloudBucket.getFiles();
+  
+      const fileNames = files.map(file => file.name);
+  
+      return res.status(200).json({ files: fileNames });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'An error occurred while fetching files' });
+    }
+  };
+
+export { uploadFile, downloadFile, createFolder, deleteFolder,deleteFile ,getAllFiles};

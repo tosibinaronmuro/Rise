@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import request from 'supertest';
 import authRouter from '../auth';  
-import { register, login, logout, forgotPassword, resetPassword } from '../../controllers/auth';  
+import { register, login, logout, forgotPassword, resetPassword } from '../../controllers/auth-users';  
 
 jest.mock('../../controllers/auth', () => ({
   register: jest.fn(),
