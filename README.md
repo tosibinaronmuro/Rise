@@ -82,9 +82,13 @@ npm run start
 - `POST /api/v1/auth/forgot-password`: provide email.
 - `POST /api/v1/auth/reset-password`: provide new password.
 - `POST /api/v1/bucket/upload`: Upload a file 
+- `POST /api/v1/bucket/create-folder`: Create a folder for storing files 
 - `POST /api/v1/bucket/upload/:folderName: Upload a file to a specified folder from the req.body with the name folderName
 - `POST /api/v1/bucket/download/:fileName`: download a file 
 - `POST /api/v1/bucket/download/:folderName/:fileName`: download a file from a specidied folder 
+- `POST /api/v1/bucket/delete/:fileName`: delete a file 
+- `POST /api/v1/bucket/delete-folder/:folderName`: delete a folder and all files in it... Should be used with caution 
+
 
 - More endpoints  cominig soon
 
@@ -116,6 +120,7 @@ docker run -p 3000:3000 -d risecloud-api
 Contributions to this project are welcome! Feel free to submit issues and pull requests.
 Also a list of possible upgrades/features are:
 -make the reset password token a one time token  
+-implement user id for all create, delete and get routes
 For any inquiries or questions, feel free to contact [tosironj@gmail.com](mailto:tosironj@gmail.com).
 ## License
 
