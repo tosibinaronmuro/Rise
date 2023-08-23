@@ -84,6 +84,8 @@ a{
   <p>You are about to reset your password for RiseCLoud. Admin. Use the following URL to complete your Password Recovery Procedure.</p>
   <a  href=${URL}> <button>Reset Password</button></a>
 
+  <p style="font-size:0.9em;">This token is valid for 5 minutes only!</p><br><br><br>
+
   <p style="font-size:0.9em;">Alternatively, you can directly paste this link in your browser</p><br>
   <p>${URL}</p>
   <p style="font-size:0.9em;">Regards,<br />RiseCLoud</p>

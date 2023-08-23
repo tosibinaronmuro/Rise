@@ -2,10 +2,13 @@ import express, { Express, Request, Response,NextFunction } from "express"
 const app:Express=express()
 import errorHandler from "./middleware/errors-handler"
 import notFoundHandler from "./middleware/not-found"
-import AuthRouter from "./routes/auth"
+import authRouter from "./routes/auth"
+import bucketRouter from "./routes/bucket"
+import authMiddleware from './middleware/auth';
 
  app.use(express.json())
-app.use("/api/v1/auth", AuthRouter); 
+app.use("/api/v1/auth", authRouter); 
+app.use("/api/v1/bucket",authMiddleware,bucketRouter); 
 
 
  app.get('/', (req:Request,res:Response)=>{

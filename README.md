@@ -81,6 +81,10 @@ npm run start
 - `POST /api/v1/auth/login`: Log in using email and password.
 - `POST /api/v1/auth/forgot-password`: provide email.
 - `POST /api/v1/auth/reset-password`: provide new password.
+- `POST /api/v1/bucket/upload`: Upload a file 
+- `POST /api/v1/bucket/upload/:folderName: Upload a file to a specified folder from the req.body with the name folderName
+- `POST /api/v1/bucket/download/:fileName`: download a file 
+- `POST /api/v1/bucket/download/:folderName/:fileName`: download a file from a specidied folder 
 
 - More endpoints  cominig soon
 
