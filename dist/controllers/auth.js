@@ -26,30 +26,31 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { fullname, email, password } = req.body;
         if (!fullname || !email || !password) {
-            throw new errors_1.BadRequest("Please provide name, email, and password");
+            throw new errors_1.BadRequest('Please provide name, email, and password');
         }
         const hashedPassword = yield bcryptjs_1.default.hash(password, 10);
         const client = yield dbConfig_1.default.connect();
         try {
-            yield client.query("BEGIN");
-            const emailExistsQuery = "SELECT * FROM users WHERE email = $1";
+            yield client.query('BEGIN');
+            const emailExistsQuery = 'SELECT * FROM users WHERE email = $1';
             const emailExistsResult = yield client.query(emailExistsQuery, [email]);
             if (emailExistsResult.rows.length > 0) {
-                throw new errors_1.BadRequest("Email already exists");
+                throw new errors_1.BadRequest('Email already exists');
             }
-            const insertUserQuery = "INSERT INTO users (fullname, email, password) VALUES ($1, $2, $3) RETURNING id";
+            const insertUserQuery = 'INSERT INTO users (fullname, email, password) VALUES ($1, $2, $3) RETURNING id';
             const insertUserResult = yield client.query(insertUserQuery, [
                 fullname,
                 email,
                 hashedPassword,
             ]);
-            console.log("Registration successful");
-            yield client.query("COMMIT");
-            const token = jsonwebtoken_1.default.sign({ userId: insertUserResult.rows[0].id }, secretKey);
-            res.status(201).json({ message: "Registration successful", token });
+            console.log('Registration successful');
+            yield client.query('COMMIT');
+            const payload = { userId: insertUserResult.rows[0].id, name: fullname };
+            const token = jsonwebtoken_1.default.sign(payload, secretKey);
+            res.status(201).json({ message: 'Registration successful', user: payload, token });
         }
         catch (error) {
-            yield client.query("ROLLBACK");
+            yield client.query('ROLLBACK');
             throw error;
         }
         finally {
@@ -58,9 +59,7 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
     catch (error) {
         console.error(error);
-        res
-            .status(error.status || 500)
-            .json({ message: error.message || "An error occurred" });
+        res.status(error.status || 500).json({ message: error.message || 'An error occurred' });
     }
 });
 exports.register = register;
@@ -68,24 +67,25 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password } = req.body;
         if (!email || !password) {
-            throw new errors_1.BadRequest("Please provide email and password");
+            throw new errors_1.BadRequest('Please provide email and password');
         }
         const client = yield dbConfig_1.default.connect();
         try {
-            const userQuery = "SELECT * FROM users WHERE email = $1";
+            const userQuery = 'SELECT * FROM users WHERE email = $1';
             const userResult = yield client.query(userQuery, [email]);
             if (userResult.rows.length === 0) {
-                throw new errors_1.BadRequest("User not found");
+                throw new errors_1.BadRequest('User not found');
             }
             const user = userResult.rows[0];
             const passwordMatch = yield bcryptjs_1.default.compare(password, user.password);
             if (!passwordMatch) {
-                throw new errors_1.BadRequest("Invalid password");
+                throw new errors_1.BadRequest('Invalid password');
             }
-            const token = jsonwebtoken_1.default.sign({ userId: user.id }, secretKey);
+            const payload = { userId: user.id, name: user.fullname };
+            const token = jsonwebtoken_1.default.sign(payload, secretKey);
             res
                 .status(200)
-                .json({ message: "Login successful", username: user.fullname, token });
+                .json({ message: 'Login successful', user: payload, token });
         }
         catch (error) {
             throw error;
@@ -96,9 +96,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
     catch (error) {
         console.error(error);
-        res
-            .status(error.status || 500)
-            .json({ message: error.message || "An error occurred" });
+        res.status(error.status || 500).json({ message: error.message || 'An error occurred' });
     }
 });
 exports.login = login;
@@ -121,7 +119,7 @@ const forgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
             }
             const user = userResult.rows[0];
             const resetToken = jsonwebtoken_1.default.sign({ userId: user.id }, secretKey, {
-                expiresIn: "1h",
+                expiresIn: "5m",
             });
             const resetLink = `http://localhost:3000/reset-password/?token=${resetToken}`;
             const mailConfigs = {
@@ -150,6 +148,49 @@ const forgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.forgotPassword = forgotPassword;
+// this controller uses a one time token 
+// const forgotPassword = async (req: Request, res: Response) => {
+//     try {
+//       const { email } = req.body;
+//       if (!email) {
+//         throw new BadRequest("Please provide an email address");
+//       }
+//       const client = await pool.connect();
+//       try {
+//         const userQuery = "SELECT * FROM users WHERE email = $1";
+//         const userResult = await client.query(userQuery, [email]);
+//         if (userResult.rows.length === 0) {
+//           throw new BadRequest("User not found");
+//         }
+//         const user = userResult.rows[0];
+//       
+//         const resetToken = crypto.randomBytes(32).toString('hex');
+//          
+//         const updateTokenQuery = "UPDATE users SET reset_token = $1 WHERE id = $2";
+//         await client.query(updateTokenQuery, [resetToken, user.id]);
+//         const resetLink = `http://localhost:3000/reset-password/?token=${resetToken}`;
+//         const mailConfigs = {
+//           from: process.env.MY_EMAIL,
+//           to: user.email,
+//           subject: "Reset Password for Your App",
+//           html: forgotPasswordEmailTemplate(resetLink, user.fullname),
+//         };
+//         await mailTransport.sendMail(mailConfigs);
+//         res
+//           .status(200)
+//           .json({ message: "Password reset link sent to your email" });
+//       } catch (error) {
+//         throw error;
+//       } finally {
+//         client.release();
+//       }
+//     } catch (error: string[] | any) {
+//       console.error(error);
+//       res
+//         .status(error.status || 500)
+//         .json({ message: error.message || "An error occurred" });
+//     }
+//   };
 const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { token, password } = req.body;

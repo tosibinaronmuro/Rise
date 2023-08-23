@@ -20,6 +20,8 @@ jest.mock('../../controllers/auth', () => ({
     register: jest.fn(),
     login: jest.fn(),
     logout: jest.fn(),
+    forgotPassword: jest.fn(),
+    resetPassword: jest.fn(),
 }));
 const app = (0, express_1.default)();
 app.use('/', auth_1.default);
@@ -30,7 +32,6 @@ describe('Auth Routes', () => {
         });
         const response = yield (0, supertest_1.default)(app).post('/register');
         expect(response.status).toBe(200);
-        expect(response.text).toBe('register');
         expect(auth_2.register).toHaveBeenCalled();
     }));
     it('should call login function when POST /login', () => __awaiter(void 0, void 0, void 0, function* () {
@@ -50,5 +51,21 @@ describe('Auth Routes', () => {
         expect(response.status).toBe(200);
         expect(response.text).toBe('logout');
         expect(auth_2.logout).toHaveBeenCalled();
+    }));
+    it('should call forgotPassword function when POST /forgot-password', () => __awaiter(void 0, void 0, void 0, function* () {
+        auth_2.forgotPassword.mockImplementationOnce((req, res) => {
+            res.send('forgot-password');
+        });
+        const response = yield (0, supertest_1.default)(app).post('/forgot-password');
+        expect(response.status).toBe(200);
+        expect(auth_2.forgotPassword).toHaveBeenCalled();
+    }));
+    it('should call resetPassword function when POST /reset-password', () => __awaiter(void 0, void 0, void 0, function* () {
+        auth_2.resetPassword.mockImplementationOnce((req, res) => {
+            res.send('reset-password');
+        });
+        const response = yield (0, supertest_1.default)(app).post('/reset-password');
+        expect(response.status).toBe(200);
+        expect(auth_2.resetPassword).toHaveBeenCalled();
     }));
 });

@@ -110,6 +110,8 @@ docker run -p 3000:3000 -d risecloud-api
 ## Contributing
 
 Contributions to this project are welcome! Feel free to submit issues and pull requests.
+Also a list of possible upgrades/features are:
+-make the reset password token a one time token  
 For any inquiries or questions, feel free to contact [tosironj@gmail.com](mailto:tosironj@gmail.com).
 ## License
 

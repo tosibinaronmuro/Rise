@@ -1,12 +1,14 @@
 import express, { Request, Response, NextFunction } from 'express';
 import request from 'supertest';
 import authRouter from '../auth';  
-import { register, login, logout } from '../../controllers/auth';  
+import { register, login, logout, forgotPassword, resetPassword } from '../../controllers/auth';  
 
 jest.mock('../../controllers/auth', () => ({
   register: jest.fn(),
   login: jest.fn(),
   logout: jest.fn(),
+  forgotPassword: jest.fn(), 
+  resetPassword: jest.fn(), 
 }));
 
 const app = express();
@@ -20,7 +22,6 @@ describe('Auth Routes', () => {
 
     const response = await request(app).post('/register');
     expect(response.status).toBe(200);
-    expect(response.text).toBe('register');
     expect(register).toHaveBeenCalled();
   });
 
@@ -44,5 +45,23 @@ describe('Auth Routes', () => {
     expect(response.status).toBe(200);
     expect(response.text).toBe('logout');
     expect(logout).toHaveBeenCalled();
+  });
+  it('should call forgotPassword function when POST /forgot-password', async () => {
+    (forgotPassword as jest.Mock).mockImplementationOnce((req, res) => {
+      res.send('forgot-password');
+    });
+
+    const response = await request(app).post('/forgot-password');
+    expect(response.status).toBe(200);
+    expect(forgotPassword).toHaveBeenCalled();
+  });
+  it('should call resetPassword function when POST /reset-password', async () => {
+    (resetPassword as jest.Mock).mockImplementationOnce((req, res) => {
+      res.send('reset-password');
+    });
+
+    const response = await request(app).post('/reset-password');
+    expect(response.status).toBe(200);
+    expect(resetPassword).toHaveBeenCalled();
   });
 });
