@@ -1,31 +1,20 @@
-// import corsOptionsMiddleware from "../corsOptions";
-// import allowedOrigins from "../allowedOrigins";
+import allowedOrigins from '../allowedOrigins';
+import corsOptions from '../corsOptions';
 
-// describe("corsOptionsMiddleware", () => {
-//   it("should allow origins in the allowedOrigins list", () => {
-//     const origin = allowedOrigins[0]; // Assuming you have at least one allowed origin
-//     const callback = jest.fn();
+describe('corsOptions', () => {
+  const mockCallback = jest.fn();
 
-//     corsOptionsMiddleware.origin!(origin, callback);
+  it('should allow requests from allowed origins', () => {
+    const allowedOrigin = allowedOrigins[0];
+    (corsOptions.origin as (origin: string, callback: (error: Error | null, success: boolean) => void) => void)(allowedOrigin, mockCallback);
 
-//     expect(callback).toHaveBeenCalledWith(null, true);
-//   });
+    expect(mockCallback).toHaveBeenCalledWith(null, true);
+  });
 
-//   it("should allow requests with undefined origin", () => {
-//     const origin = undefined;
-//     const callback = jest.fn();
+  it('should disallow requests from unallowed origins', () => {
+    const unallowedOrigin = 'https://example.com';
+    (corsOptions.origin as (origin: string, callback: (error: Error | null, success: boolean) => void) => void)(unallowedOrigin, mockCallback);
 
-//     corsOptionsMiddleware.origin!(origin, callback);
-
-//     expect(callback).toHaveBeenCalledWith(null, true);
-//   });
-
-//   it("should disallow origins not in the allowedOrigins list", () => {
-//     const origin = "http://example.com"; // An origin not in the allowedOrigins list
-//     const callback = jest.fn();
-
-//     corsOptionsMiddleware.origin!(origin, callback);
-
-//     expect(callback).toHaveBeenCalledWith(new Error('Not allowed by CORS'), false);
-//   });
-// });
+    expect(mockCallback).toHaveBeenCalledWith(new Error('Not allowed by CORS'));
+  });
+});

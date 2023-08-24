@@ -1,23 +1,20 @@
 "use strict";
-// import corsOptionsMiddleware from "../corsOptions";
-// import allowedOrigins from "../allowedOrigins";
-// describe("corsOptionsMiddleware", () => {
-//   it("should allow origins in the allowedOrigins list", () => {
-//     const origin = allowedOrigins[0]; // Assuming you have at least one allowed origin
-//     const callback = jest.fn();
-//     corsOptionsMiddleware.origin!(origin, callback);
-//     expect(callback).toHaveBeenCalledWith(null, true);
-//   });
-//   it("should allow requests with undefined origin", () => {
-//     const origin = undefined;
-//     const callback = jest.fn();
-//     corsOptionsMiddleware.origin!(origin, callback);
-//     expect(callback).toHaveBeenCalledWith(null, true);
-//   });
-//   it("should disallow origins not in the allowedOrigins list", () => {
-//     const origin = "http://example.com"; // An origin not in the allowedOrigins list
-//     const callback = jest.fn();
-//     corsOptionsMiddleware.origin!(origin, callback);
-//     expect(callback).toHaveBeenCalledWith(new Error('Not allowed by CORS'), false);
-//   });
-// });
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const allowedOrigins_1 = __importDefault(require("../allowedOrigins"));
+const corsOptions_1 = __importDefault(require("../corsOptions"));
+describe('corsOptions', () => {
+    const mockCallback = jest.fn();
+    it('should allow requests from allowed origins', () => {
+        const allowedOrigin = allowedOrigins_1.default[0];
+        corsOptions_1.default.origin(allowedOrigin, mockCallback);
+        expect(mockCallback).toHaveBeenCalledWith(null, true);
+    });
+    it('should disallow requests from unallowed origins', () => {
+        const unallowedOrigin = 'https://example.com';
+        corsOptions_1.default.origin(unallowedOrigin, mockCallback);
+        expect(mockCallback).toHaveBeenCalledWith(new Error('Not allowed by CORS'));
+    });
+});
