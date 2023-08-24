@@ -24,11 +24,6 @@ const deleteFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     try {
         const fileName = req.params.fileName;
         const file = risecloudBucket.file(fileName);
-        const createdBy = file.metadata.createdBy;
-        console.log("createdBy " + file.metadata.createdBy, "req.user " + req.user);
-        if (!req.user || !createdBy || req.user.userId !== createdBy.id) {
-            return res.status(403).json({ message: "Unauthorized" });
-        }
         yield file.delete();
         return res.status(200).json({ message: "File deleted successfully" });
     }
@@ -41,23 +36,12 @@ const deleteFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 });
 exports.deleteFile = deleteFile;
 const deleteFolder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
     try {
         const folderName = req.params.folderName;
-        // Check if the user is authorized to delete the folder and its contents
-        const createdBy = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
-        if (!createdBy) {
-            return res.status(403).json({ message: "Unauthorized" });
-        }
         const [files] = yield risecloudBucket.getFiles({
             prefix: `${folderName}/`,
         });
         for (const file of files) {
-            const fileCreatedBy = (_b = file.metadata.createdBy) === null || _b === void 0 ? void 0 : _b.id;
-            console.log("fileCreatedby " + fileCreatedBy, "createdby" + createdBy);
-            if (fileCreatedBy !== createdBy) {
-                return res.status(403).json({ message: "Unauthorized" });
-            }
             yield file.delete();
         }
         return res
