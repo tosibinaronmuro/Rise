@@ -16,7 +16,6 @@ const router = express.Router();
 
 const secretKey: SecretKey = process.env.JWT_SECRET || "";
 
- 
 
 const register = async (req: Request, res: Response) => {
   try {
@@ -47,11 +46,9 @@ const register = async (req: Request, res: Response) => {
         hashedPassword,
       ]);
 
-      console.log('Registration successful');
-
       await client.query('COMMIT');
 
-      const payload = { userId: insertUserResult.rows[0].id, name: fullname };
+      const payload = { userId: insertUserResult.rows[0].id, name: fullname ,email:email};
       const token = jwt.sign(payload, secretKey);
 
       res.status(201).json({ message: 'Registration successful', user: payload, token });
@@ -91,12 +88,11 @@ const login = async (req: Request, res: Response) => {
         throw new BadRequest('Invalid password');
       }
 
-      const payload = { userId: user.id, name: user.fullname };
+
+      const payload = { userId: user.id, name: user.fullname ,email:user.email};
       const token = jwt.sign(payload, secretKey);
 
-      res
-        .status(200)
-        .json({ message: 'Login successful', user: payload, token });
+      res.status(200).json({ message: 'Login successful', user: payload, token });
     } catch (error) {
       throw error;
     } finally {
@@ -108,6 +104,7 @@ const login = async (req: Request, res: Response) => {
   }
 };
 
+ 
  
 
 

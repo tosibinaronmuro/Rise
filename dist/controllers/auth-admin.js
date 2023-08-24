@@ -25,6 +25,7 @@ const secretKey = process.env.JWT_SECRET || "";
 const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { fullname, email, password } = req.body;
+        const role = 'admin';
         if (!fullname || !email || !password) {
             throw new errors_1.BadRequest('Please provide name, email, and password');
         }
@@ -32,20 +33,21 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const client = yield dbConfig_1.default.connect();
         try {
             yield client.query('BEGIN');
-            const emailExistsQuery = 'SELECT * FROM admins WHERE email = $1';
+            const emailExistsQuery = 'SELECT * FROM admin WHERE email = $1';
             const emailExistsResult = yield client.query(emailExistsQuery, [email]);
             if (emailExistsResult.rows.length > 0) {
                 throw new errors_1.BadRequest('Email already exists');
             }
-            const insertUserQuery = 'INSERT INTO admins (fullname, email, password) VALUES ($1, $2, $3) RETURNING id';
+            const insertUserQuery = 'INSERT INTO admin (fullname, email, password,role) VALUES ($1, $2, $3,$4) RETURNING id';
             const insertUserResult = yield client.query(insertUserQuery, [
                 fullname,
                 email,
                 hashedPassword,
+                role
             ]);
             console.log('Registration successful');
             yield client.query('COMMIT');
-            const payload = { userId: insertUserResult.rows[0].id, name: fullname };
+            const payload = { userId: insertUserResult.rows[0].id, name: fullname, role: role };
             const token = jsonwebtoken_1.default.sign(payload, secretKey);
             res.status(201).json({ message: 'Registration successful', user: payload, token });
         }
@@ -66,12 +68,13 @@ exports.register = register;
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password } = req.body;
+        // const role='admin';
         if (!email || !password) {
             throw new errors_1.BadRequest('Please provide email and password');
         }
         const client = yield dbConfig_1.default.connect();
         try {
-            const userQuery = 'SELECT * FROM admins WHERE email = $1';
+            const userQuery = 'SELECT * FROM admin WHERE email = $1';
             const userResult = yield client.query(userQuery, [email]);
             if (userResult.rows.length === 0) {
                 throw new errors_1.BadRequest('User not found');
@@ -81,7 +84,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             if (!passwordMatch) {
                 throw new errors_1.BadRequest('Invalid password');
             }
-            const payload = { userId: user.id, name: user.fullname };
+            const payload = { userId: user.id, name: user.fullname, role: user.role };
             const token = jsonwebtoken_1.default.sign(payload, secretKey);
             res
                 .status(200)
@@ -112,7 +115,7 @@ const forgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
         }
         const client = yield dbConfig_1.default.connect();
         try {
-            const userQuery = "SELECT * FROM admins WHERE email = $1";
+            const userQuery = "SELECT * FROM admin WHERE email = $1";
             const userResult = yield client.query(userQuery, [email]);
             if (userResult.rows.length === 0) {
                 throw new errors_1.BadRequest("User not found");
@@ -157,7 +160,7 @@ exports.forgotPassword = forgotPassword;
 //       }
 //       const client = await pool.connect();
 //       try {
-//         const userQuery = "SELECT * FROM admins WHERE email = $1";
+//         const userQuery = "SELECT * FROM admin WHERE email = $1";
 //         const userResult = await client.query(userQuery, [email]);
 //         if (userResult.rows.length === 0) {
 //           throw new BadRequest("User not found");
@@ -166,7 +169,7 @@ exports.forgotPassword = forgotPassword;
 //       
 //         const resetToken = crypto.randomBytes(32).toString('hex');
 //          
-//         const updateTokenQuery = "UPDATE admins SET reset_token = $1 WHERE id = $2";
+//         const updateTokenQuery = "UPDATE admin SET reset_token = $1 WHERE id = $2";
 //         await client.query(updateTokenQuery, [resetToken, user.id]);
 //         const resetLink = `http://localhost:3000/reset-password/?token=${resetToken}`;
 //         const mailConfigs = {
@@ -203,10 +206,10 @@ const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         const hashedPassword = yield bcryptjs_1.default.hash(password, 10);
         const client = yield dbConfig_1.default.connect();
         try {
-            const updateQuery = 'UPDATE admins SET password = $1 WHERE id = $2';
+            const updateQuery = 'UPDATE admin SET password = $1 WHERE id = $2';
             yield client.query(updateQuery, [hashedPassword, userId]);
             // Send confirmation email
-            const userQuery = 'SELECT * FROM admins WHERE id = $1';
+            const userQuery = 'SELECT * FROM admin WHERE id = $1';
             const userResult = yield client.query(userQuery, [userId]);
             const user = userResult.rows[0];
             const mailConfigs = {

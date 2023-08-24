@@ -1,12 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken'; 
 import { Unauthenticated } from '../errors';
-import  {Payload, SecretKey } from 'types';
-
+import  { Payload, SecretKey } from 'types';
 
 const secretKey: SecretKey = process.env.JWT_SECRET || "";
 
-const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+const adminAuthMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer')) {
     throw new Unauthenticated('Authentication invalid');
@@ -23,15 +22,20 @@ const authMiddleware = async (req: Request, res: Response, next: NextFunction) =
   if (!token) {
     throw new Unauthenticated('Authentication invalid');
   }
+
   try {
     const payload = jwt.verify(token, secretKey) as Payload;
-     
+    
+    // Check if the user is an admin
+    if (payload.role !== 'admin') {
+      throw new Unauthenticated('Only admins are allowed');
+    }
+
     req.user = payload;  
     next();
   } catch (error) {
     next(error)
   }
-   
 };
 
-export default authMiddleware;
+export default adminAuthMiddleware;

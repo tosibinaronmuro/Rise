@@ -18,19 +18,29 @@ The RiseCloud Cloud Backup App API is a backend service that powers a cloud back
 
 
 ## API Endpoints
-
+### User Auth
 - `POST /api/v1/auth/register`: Register a new user account with email, password, and full name.
 - `POST /api/v1/auth/login`: Log in using email and password.
 - `POST /api/v1/auth/forgot-password`: Provide email.
 - `POST /api/v1/auth/reset-password`: Provide new password.
+
+### Admin Auth
+- `POST /api/v1/auth/admin/register`: Register a new user account with email, password, and full name.
+- `POST /api/v1/auth/admin/login`: Log in using email and password.
+- `POST /api/v1/auth/admin/forgot-password`: Provide email.
+- `POST /api/v1/auth/admin/reset-password`: Provide new password.
+
+### User cloud functionalities
 - `POST /api/v1/bucket/upload`: Upload a file 
 - `POST /api/v1/bucket/create-folder`: Create a folder for storing files 
 - `POST /api/v1/bucket/upload/:folderName`: Upload a file to a specified folder from the req.body with the name folderName
 - `GET /api/v1/bucket/download/:fileName`: Download a file 
 - `GET /api/v1/bucket/download/:folderName/:fileName`: download a file from a specidied folder 
-- `DELETE /api/v1/bucket/delete/:fileName`: Delete a file 
-- `DELETE /api/v1/bucket/delete-folder/:folderName`: Delete a folder and all files in it... Should be used with caution 
-- `GET /api/v1/bucket/get-all-files`: Get all files 
+
+### Admin cloud functionalities
+- `DELETE /api/v1/admin/bucket/delete/:fileName`: Delete a file 
+- `DELETE /api/v1/admin/bucket/delete-folder/:folderName`: Delete a folder and all files in it... Should be used with caution 
+- `GET /api/v1/admin/bucket/get-all-files`: Get all files 
 
 
 - More endpoints  cominig soon

@@ -43,9 +43,8 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 email,
                 hashedPassword,
             ]);
-            console.log('Registration successful');
             yield client.query('COMMIT');
-            const payload = { userId: insertUserResult.rows[0].id, name: fullname };
+            const payload = { userId: insertUserResult.rows[0].id, name: fullname, email: email };
             const token = jsonwebtoken_1.default.sign(payload, secretKey);
             res.status(201).json({ message: 'Registration successful', user: payload, token });
         }
@@ -81,11 +80,9 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             if (!passwordMatch) {
                 throw new errors_1.BadRequest('Invalid password');
             }
-            const payload = { userId: user.id, name: user.fullname };
+            const payload = { userId: user.id, name: user.fullname, email: user.email };
             const token = jsonwebtoken_1.default.sign(payload, secretKey);
-            res
-                .status(200)
-                .json({ message: 'Login successful', user: payload, token });
+            res.status(200).json({ message: 'Login successful', user: payload, token });
         }
         catch (error) {
             throw error;

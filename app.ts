@@ -5,12 +5,15 @@ import notFoundHandler from "./middleware/not-found"
 import authRouter from "./routes/auth"
 import authAdminRouter from "./routes/auth-admin"
 import bucketRouter from "./routes/bucket"
+import bucketAdminRouter from "./routes/bucket-admin"
 import authMiddleware from './middleware/auth';
+import adminAuthMiddleware from './middleware/admin-auth';
 
  app.use(express.json())
 app.use("/api/v1/auth", authRouter); 
 app.use("/api/v1/auth/admin", authAdminRouter); 
-app.use("/api/v1/bucket",authMiddleware,bucketRouter); 
+app.use("/api/v1/bucket", authMiddleware, bucketRouter);
+app.use("/api/v1/admin/bucket", adminAuthMiddleware, bucketAdminRouter);
 
 
  app.get('/', (req:Request,res:Response)=>{
@@ -19,6 +22,7 @@ app.use("/api/v1/bucket",authMiddleware,bucketRouter);
   
  app.use(errorHandler)
  app.use(notFoundHandler)
+ 
 
 
 const port = process.env.PORT || 8000

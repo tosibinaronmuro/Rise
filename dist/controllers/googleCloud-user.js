@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllFiles = exports.deleteFile = exports.deleteFolder = exports.createFolder = exports.downloadFile = exports.uploadFile = void 0;
+exports.createFolder = exports.downloadFile = exports.uploadFile = void 0;
 const storage_1 = require("@google-cloud/storage");
 const stream_1 = require("stream");
 const path_1 = __importDefault(require("path"));
@@ -46,13 +46,30 @@ const uploadFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         else {
             contentType = "application/octet-stream";
         }
+        const createdBy = req.user;
         const fileOptions = {
             resumable: false,
             validation: "md5",
+            // metadata: {
+            //   contentType,
+            //   createdBy: {
+            //     id: createdBy.userId,
+            //     fullname: createdBy.name,
+            //   },
+            //   createdAt: new Date(),
+            //   flag: false,
+            // },
             metadata: {
                 contentType,
+                createdBy: {
+                    id: createdBy.userId,
+                    fullName: createdBy.name,
+                },
+                createdAt: new Date(),
+                flag: false,
             },
         };
+        console.log("fileoptions: ", fileOptions);
         let file;
         if (folderName) {
             file = risecloudBucket.file(`${folderName}/${destinationFileName}`);
@@ -70,7 +87,9 @@ const uploadFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         readableStream.pipe(writableStream);
         writableStream.on("finish", () => {
             console.log(`File ${destinationFileName} uploaded to bucket`);
-            return res.status(201).json({ message: "File uploaded successfully" });
+            return res
+                .status(201)
+                .json({ message: "File uploaded successfully", payload: fileOptions });
         });
         writableStream.on("error", (error) => {
             console.error(error);
@@ -94,6 +113,7 @@ const downloadFile = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         const filePath = folderName ? `${folderName}/${fileName}` : fileName;
         const file = risecloudBucket.file(filePath);
         const readableStream = file.createReadStream();
+        console.log("file: ", file);
         const extension = path_1.default.extname(fileName);
         let contentType = "application/octet-stream";
         if (extension === ".pdf") {
@@ -116,7 +136,7 @@ const downloadFile = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         readableStream.pipe(res);
     }
     catch (error) {
-        console.error(error);
+        console.error("-----=------------=-----------------=-------------------=----------------=-----------------=----------------=-------------=Error:", error);
         return res
             .status(500)
             .json({ message: "An error occurred while downloading the file" });
@@ -145,55 +165,3 @@ const createFolder = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.createFolder = createFolder;
-const deleteFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const fileName = req.params.fileName;
-        const file = risecloudBucket.file(fileName);
-        // TODO: Implement authorization logic here to check if the user is allowed to delete the file
-        file.delete();
-        return res.status(200).json({ message: "File deleted successfully" });
-    }
-    catch (error) {
-        console.error(error);
-        return res
-            .status(500)
-            .json({ message: "An error occurred while deleting the file" });
-    }
-});
-exports.deleteFile = deleteFile;
-const deleteFolder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const folderName = req.params.folderName;
-        // TODO: Implement authorization logic here to check if the user is allowed to delete the folder
-        const [files] = yield risecloudBucket.getFiles({
-            prefix: `${folderName}/`,
-        });
-        for (const file of files) {
-            yield file.delete();
-        }
-        return res
-            .status(200)
-            .json({ message: "Folder and its contents deleted successfully" });
-    }
-    catch (error) {
-        console.error(error);
-        return res
-            .status(500)
-            .json({ message: "An error occurred while deleting the folder" });
-    }
-});
-exports.deleteFolder = deleteFolder;
-const getAllFiles = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const [files] = yield risecloudBucket.getFiles();
-        const fileNames = files.map((file) => file.name);
-        return res.status(200).json({ files: fileNames });
-    }
-    catch (error) {
-        console.error(error);
-        return res
-            .status(500)
-            .json({ message: "An error occurred while fetching files" });
-    }
-});
-exports.getAllFiles = getAllFiles;

@@ -3,6 +3,8 @@ import express from "express";
 import { Storage } from "@google-cloud/storage";
 import { Readable } from "stream";
 import path from "path";
+import { Payload } from "types";
+import StorageError from "../errors/storageError";
 
 const gc = new Storage({
   keyFilename: path.join(
@@ -39,15 +41,31 @@ const uploadFile = async (req: Request, res: Response) => {
     } else {
       contentType = "application/octet-stream";
     }
+    const createdBy: Payload = req.user as Payload;
 
     const fileOptions = {
       resumable: false,
       validation: "md5",
+      // metadata: {
+      //   contentType,
+      //   createdBy: {
+      //     id: createdBy.userId,
+      //     fullname: createdBy.name,
+      //   },
+      //   createdAt: new Date(),
+      //   flag: false,
+      // },
       metadata: {
         contentType,
+        createdBy: {
+          id: createdBy.userId,
+          fullName: createdBy.name,
+        },
+        createdAt: new Date(),
+        flag: false,
       },
     };
-
+    console.log("fileoptions: ", fileOptions);
     let file;
 
     if (folderName) {
@@ -69,7 +87,9 @@ const uploadFile = async (req: Request, res: Response) => {
 
     writableStream.on("finish", () => {
       console.log(`File ${destinationFileName} uploaded to bucket`);
-      return res.status(201).json({ message: "File uploaded successfully" });
+      return res
+        .status(201)
+        .json({ message: "File uploaded successfully", payload: fileOptions });
     });
 
     writableStream.on("error", (error) => {
@@ -93,7 +113,7 @@ const downloadFile = async (req: Request, res: Response) => {
     const filePath = folderName ? `${folderName}/${fileName}` : fileName;
     const file = risecloudBucket.file(filePath);
     const readableStream = file.createReadStream();
-
+    console.log("file: ", file);
     const extension = path.extname(fileName);
 
     let contentType = "application/octet-stream";
@@ -114,8 +134,9 @@ const downloadFile = async (req: Request, res: Response) => {
     res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
 
     readableStream.pipe(res);
-  } catch (error) {
-    console.error(error);
+  } catch (error:any) {
+    console.error("-----=------------=-----------------=-------------------=----------------=-----------------=----------------=-------------=Error:", error);
+     
     return res
       .status(500)
       .json({ message: "An error occurred while downloading the file" });
@@ -146,70 +167,11 @@ const createFolder = async (req: Request, res: Response) => {
       .json({ message: "An error occurred while creating the folder" });
   }
 };
-const deleteFile = async (req: Request, res: Response) => {
-  try {
-    const fileName = req.params.fileName;
 
-    const file = risecloudBucket.file(fileName);
-
-    // TODO: Implement authorization logic here to check if the user is allowed to delete the file
-
-    file.delete();
-
-    return res.status(200).json({ message: "File deleted successfully" });
-  } catch (error) {
-    console.error(error);
-    return res
-      .status(500)
-      .json({ message: "An error occurred while deleting the file" });
-  }
-};
-
-const deleteFolder = async (req: Request, res: Response) => {
-  try {
-    const folderName = req.params.folderName;
-
-    // TODO: Implement authorization logic here to check if the user is allowed to delete the folder
-
-    const [files] = await risecloudBucket.getFiles({
-      prefix: `${folderName}/`,
-    });
-
-    for (const file of files) {
-      await file.delete();
-    }
-
-    return res
-      .status(200)
-      .json({ message: "Folder and its contents deleted successfully" });
-  } catch (error) {
-    console.error(error);
-    return res
-      .status(500)
-      .json({ message: "An error occurred while deleting the folder" });
-  }
-};
-
-const getAllFiles = async (req: Request, res: Response) => {
-  try {
-    const [files] = await risecloudBucket.getFiles();
-
-    const fileNames = files.map((file) => file.name);
-
-    return res.status(200).json({ files: fileNames });
-  } catch (error) {
-    console.error(error);
-    return res
-      .status(500)
-      .json({ message: "An error occurred while fetching files" });
-  }
-};
 
 export {
   uploadFile,
   downloadFile,
   createFolder,
-  deleteFolder,
-  deleteFile,
-  getAllFiles,
+  
 };

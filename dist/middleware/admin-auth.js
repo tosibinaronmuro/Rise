@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const errors_1 = require("../errors");
 const secretKey = process.env.JWT_SECRET || "";
-const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const adminAuthMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer')) {
         throw new errors_1.Unauthenticated('Authentication invalid');
@@ -32,6 +32,10 @@ const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
     }
     try {
         const payload = jsonwebtoken_1.default.verify(token, secretKey);
+        // Check if the user is an admin
+        if (payload.role !== 'admin') {
+            throw new errors_1.Unauthenticated('Only admins are allowed');
+        }
         req.user = payload;
         next();
     }
@@ -39,4 +43,4 @@ const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
         next(error);
     }
 });
-exports.default = authMiddleware;
+exports.default = adminAuthMiddleware;

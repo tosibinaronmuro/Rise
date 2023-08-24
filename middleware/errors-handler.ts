@@ -1,7 +1,9 @@
 import { StatusCodes } from "http-status-codes";
 import CustomError  from "../errors/custom-error";
 import express from "express";
+ 
 import { Request, Response, NextFunction } from 'express';
+ 
  
 
 
@@ -9,6 +11,7 @@ interface CustomErrorResponse {
   msg: string;
   statusCode?: number;
 }
+ 
 
 const errorHandler = (
   err: Error,
@@ -38,15 +41,14 @@ const errorHandler = (
       customError.statusCode = StatusCodes.BAD_REQUEST;
     }
   }
-
+   
   if (err.name === 'CastError') {
-    customError.msg = `No item found with id: `;
+    customError.msg = `No item found with id `;
     customError.statusCode = StatusCodes.NOT_FOUND;
   }
+  
 
-  return res
-    .status(customError.statusCode || StatusCodes.INTERNAL_SERVER_ERROR)
-    .json({ msg: customError.msg });
+  return res.status(customError.statusCode || StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: customError.msg });
 };
 
 export default errorHandler;

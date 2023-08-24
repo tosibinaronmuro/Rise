@@ -24,11 +24,9 @@ const errorHandler = (err, req, res, next) => {
         }
     }
     if (err.name === 'CastError') {
-        customError.msg = `No item found with id: `;
+        customError.msg = `No item found with id `;
         customError.statusCode = http_status_codes_1.StatusCodes.NOT_FOUND;
     }
-    return res
-        .status(customError.statusCode || http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ msg: customError.msg });
+    return res.status(customError.statusCode || http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR).json({ msg: customError.msg });
 };
 exports.default = errorHandler;
