@@ -30,17 +30,18 @@ The RiseCloud Cloud Backup App API is a backend service that powers a cloud back
 - `POST /api/v1/auth/admin/forgot-password`: Provide email.
 - `POST /api/v1/auth/admin/reset-password`: Provide new password.
 
-### User cloud functionalities
+### User   functionalities
 - `POST /api/v1/bucket/upload`: Upload a file 
 - `POST /api/v1/bucket/create-folder`: Create a folder for storing files 
 - `POST /api/v1/bucket/upload/:folderName`: Upload a file to a specified folder from the req.body with the name folderName
 - `GET /api/v1/bucket/download/:fileName`: Download a file 
 - `GET /api/v1/bucket/download/:folderName/:fileName`: download a file from a specidied folder 
 
-### Admin cloud functionalities
+### Admin   functionalities
 - `DELETE /api/v1/admin/bucket/delete/:fileName`: Delete a file 
 - `DELETE /api/v1/admin/bucket/delete-folder/:folderName`: Delete a folder and all files in it... Should be used with caution 
 - `GET /api/v1/admin/bucket/get-all-files`: Get all files 
+- `PUT /api/v1/admin/bucket/terminate-session/:userId`: Allows the Admin to revoke a users session 
 
 
 - More endpoints  cominig soon
