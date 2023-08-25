@@ -13,5 +13,7 @@ router.route('/upload').post(upload.single('file'), googleCloud_user_1.uploadFil
 router.route('/create-folder').post(googleCloud_user_1.createFolder);
 router.route('/upload/:folderName').post(upload.single('file'), googleCloud_user_1.uploadFile);
 router.route('/download/:fileName').get(googleCloud_user_1.downloadFile);
+router.route('/get-all-files').get(googleCloud_user_1.getAllFiles);
 router.route('/download/:folderName/:fileName').get(googleCloud_user_1.downloadFile);
+router.route('/delete/:fileName').delete(googleCloud_user_1.deleteFile);
 exports.default = router;

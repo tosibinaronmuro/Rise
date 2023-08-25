@@ -38,6 +38,8 @@ The RiseCloud Cloud Backup App API is a backend service that powers a cloud back
 - `POST /api/v1/bucket/upload/:folderName`: Upload a file to a specified folder from the req.body with the name folderName
 - `GET /api/v1/bucket/download/:fileName`: Download a file 
 - `GET /api/v1/bucket/download/:folderName/:fileName`: download a file from a specidied folder 
+- `GET /api/v1/bucket/get-all-files`: Get all files created by the user 
+- `DELETE /api/v1/bucket/delete/:fileName`: Delete a file created by the user 
 
 ### Admin   functionalities
 - `DELETE /api/v1/admin/bucket/delete/:fileName`: Delete a file 

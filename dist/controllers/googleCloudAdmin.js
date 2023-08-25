@@ -60,22 +60,50 @@ const deleteFolder = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.deleteFolder = deleteFolder;
+// const getAllFiles = async (req: Request, res: Response) => {
+//   try {
+//     const [files] = await risecloudBucket.getFiles();
+//     const fileDetails = files.map((file) => {
+//       const fileName = file.name;
+//       const encodedFileName = encodeURIComponent(fileName);
+//       const createdBy = file.metadata.createdBy as Payload | undefined;
+//       return {
+//         fileName,
+//         encodedFileName,
+//         uploaderFullName: createdBy ? createdBy.fullName : "Unknown",
+//         uploaderUserId: createdBy ? createdBy.userId : "Unknown",
+//       };
+//     });
+//     return res.status(200).json({ files: fileDetails });
+//   } catch (error) {
+//     console.error(error);
+//     return res
+//       .status(500)
+//       .json({ message: "An error occurred while fetching files" });
+//   }
+// };
 const getAllFiles = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const [files] = yield risecloudBucket.getFiles();
-        const fileDetails = files.map((file) => {
-            const fileName = file.name;
+        const query = `
+      SELECT filename, fullname  , userid  ,filelink
+      FROM uploads
+    `;
+        const result = yield dbConfig_1.default.query(query);
+        const files = result.rows.map((row) => {
+            const fileName = row.filename;
             const encodedFileName = encodeURIComponent(fileName);
-            const createdBy = file.metadata.createdBy;
-            console.log("createdBy:", createdBy, "metadata: ", file.metadata, " file: ", file);
+            const uploaderFullName = row.fullname;
+            const uploaderUserId = row.userid;
+            const filelink = row.filelink;
             return {
                 fileName,
                 encodedFileName,
-                uploaderFullName: createdBy ? createdBy.fullName : "Unknown",
-                uploaderUserId: createdBy ? createdBy.userId : "Unknown",
+                uploaderFullName,
+                uploaderUserId,
+                filelink,
             };
         });
-        return res.status(200).json({ files: fileDetails });
+        return res.status(200).json({ files });
     }
     catch (error) {
         console.error(error);

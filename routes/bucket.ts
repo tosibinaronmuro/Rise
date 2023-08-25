@@ -1,5 +1,5 @@
 import express from 'express';
-import { uploadFile, downloadFile, createFolder,   } from '../controllers/googleCloud-user';
+import { uploadFile, downloadFile, createFolder, getAllFiles,deleteFile  } from '../controllers/googleCloud-user';
 
 import multer from 'multer';
 const storage = multer.memoryStorage();
@@ -11,7 +11,9 @@ router.route('/upload').post(upload.single('file'), uploadFile);
 router.route('/create-folder').post(createFolder);
 router.route('/upload/:folderName').post(upload.single('file'), uploadFile);  
 router.route('/download/:fileName').get(downloadFile);
+router.route('/get-all-files').get(getAllFiles);
 router.route('/download/:folderName/:fileName').get(downloadFile);
+router.route('/delete/:fileName').delete(deleteFile);
 
 
 export default router;

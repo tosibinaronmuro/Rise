@@ -57,32 +57,57 @@ const deleteFolder = async (req: Request, res: Response) => {
   }
 };
 
+// const getAllFiles = async (req: Request, res: Response) => {
+//   try {
+//     const [files] = await risecloudBucket.getFiles();
+
+//     const fileDetails = files.map((file) => {
+//       const fileName = file.name;
+//       const encodedFileName = encodeURIComponent(fileName);
+//       const createdBy = file.metadata.createdBy as Payload | undefined;
+
+//       return {
+//         fileName,
+//         encodedFileName,
+//         uploaderFullName: createdBy ? createdBy.fullName : "Unknown",
+//         uploaderUserId: createdBy ? createdBy.userId : "Unknown",
+//       };
+//     });
+
+//     return res.status(200).json({ files: fileDetails });
+//   } catch (error) {
+//     console.error(error);
+//     return res
+//       .status(500)
+//       .json({ message: "An error occurred while fetching files" });
+//   }
+// };
 const getAllFiles = async (req: Request, res: Response) => {
   try {
-    const [files] = await risecloudBucket.getFiles();
+    const query = `
+      SELECT filename, fullname  , userid  ,filelink
+      FROM uploads
+    `;
 
-    const fileDetails = files.map((file) => {
-      const fileName = file.name;
+    const result = await pool.query(query);
+
+    const files = result.rows.map((row) => {
+      const fileName = row.filename;
       const encodedFileName = encodeURIComponent(fileName);
-      const createdBy = file.metadata.createdBy as Payload | undefined;
-      console.log(
-        "createdBy:",
-        createdBy,
-        "metadata: ",
-        file.metadata,
-        " file: ",
-        file
-      );
+      const uploaderFullName = row.fullname ;
+      const uploaderUserId = row.userid;
+      const filelink=row.filelink
 
       return {
         fileName,
         encodedFileName,
-        uploaderFullName: createdBy ? createdBy.fullName : "Unknown",
-        uploaderUserId: createdBy ? createdBy.userId : "Unknown",
+        uploaderFullName,
+        uploaderUserId,
+        filelink,
       };
     });
 
-    return res.status(200).json({ files: fileDetails });
+    return res.status(200).json({ files });
   } catch (error) {
     console.error(error);
     return res
@@ -90,6 +115,7 @@ const getAllFiles = async (req: Request, res: Response) => {
       .json({ message: "An error occurred while fetching files" });
   }
 };
+
 
 const invalidatePublicKey = async (req: Request, res: Response) => {
   const adminToken = req.headers.authorization?.split(" ")[1];
