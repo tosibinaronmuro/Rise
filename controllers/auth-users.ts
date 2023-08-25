@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
 import { StatusCodes } from "http-status-codes";
-import { BadRequest, CustomError } from "../errors";
+import { BadRequest, CustomError, Unauthenticated } from "../errors";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import pool from "../dbConfig";
@@ -125,13 +125,37 @@ const login = async (req: Request, res: Response) => {
 };
 
 
- 
+  
  
 
 
-const logout = (req: Request, res: Response) => {
-  res.status(StatusCodes.OK).send("logout");
+const logout = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    console.log(req.user, 'hello');  
+    if (!userId) {
+      throw new Unauthenticated('User not authenticated');
+    }
+
+   
+
+    const client = await pool.connect();
+    try {
+      const updatePublicKeyQuery = 'UPDATE users SET "publicKey" = NULL WHERE id = $1';
+      await client.query(updatePublicKeyQuery, [userId]);
+
+      res.status(200).json({ message: 'Logout successful' });
+    } catch (error) {
+      throw error;
+    } finally {
+      client.release();
+    }
+  } catch (error: any) {
+    console.error(error);
+    res.status(error.status || 500).json({ message: error.message || 'An error occurred' });
+  }
 };
+
 
 const forgotPassword = async (req: Request, res: Response) => {
   try {

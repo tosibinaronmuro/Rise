@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken'; 
 import { Unauthenticated } from '../errors';
 import  { Payload, SecretKey } from 'types';
+import pool from '../dbConfig';
 
 const secretKey: SecretKey = process.env.JWT_SECRET || "";
 
@@ -10,7 +11,7 @@ const adminAuthMiddleware = async (req: Request, res: Response, next: NextFuncti
   if (!authHeader || !authHeader.startsWith('Bearer')) {
     throw new Unauthenticated('Authentication invalid');
   }
-
+ 
   let token: string | undefined;
 
   if (authHeader && authHeader.startsWith('Bearer')) {
@@ -26,13 +27,33 @@ const adminAuthMiddleware = async (req: Request, res: Response, next: NextFuncti
   try {
     const payload = jwt.verify(token, secretKey) as Payload;
     
-    // Check if the user is an admin
+    
     if (payload.role !== 'admin') {
       throw new Unauthenticated('Only admins are allowed');
     }
+    const client = await pool.connect();
+    try {
+      const userQuery = 'SELECT "publicKey" FROM admin WHERE id = $1';
+      const userResult = await client.query(userQuery, [payload.userId]);
 
-    req.user = payload;  
-    next();
+      if (userResult.rows.length === 0) {
+        throw new Unauthenticated('User not found');
+      }
+ 
+      const userPublicKey = userResult.rows[0].publicKey;
+      // console.log(userPublicKey)
+      if (userPublicKey !== payload.publicKey) {
+        throw new Unauthenticated('Public key mismatch, retry login');
+      } else {
+        req.user = payload;
+        next();
+      }
+    } catch (error) {
+      throw error;
+    } finally {
+      client.release();
+    }
+    
   } catch (error) {
     next(error)
   }

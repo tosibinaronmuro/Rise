@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.resetPassword = exports.forgotPassword = exports.logout = exports.login = exports.register = void 0;
 const express_1 = __importDefault(require("express"));
-const http_status_codes_1 = require("http-status-codes");
 const errors_1 = require("../errors");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -113,9 +112,32 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.login = login;
-const logout = (req, res) => {
-    res.status(http_status_codes_1.StatusCodes.OK).send("logout");
-};
+const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    try {
+        const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
+        console.log(req.user, 'hello');
+        if (!userId) {
+            throw new errors_1.Unauthenticated('User not authenticated');
+        }
+        const client = yield dbConfig_1.default.connect();
+        try {
+            const updatePublicKeyQuery = 'UPDATE users SET "publicKey" = NULL WHERE id = $1';
+            yield client.query(updatePublicKeyQuery, [userId]);
+            res.status(200).json({ message: 'Logout successful' });
+        }
+        catch (error) {
+            throw error;
+        }
+        finally {
+            client.release();
+        }
+    }
+    catch (error) {
+        console.error(error);
+        res.status(error.status || 500).json({ message: error.message || 'An error occurred' });
+    }
+});
 exports.logout = logout;
 const forgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {

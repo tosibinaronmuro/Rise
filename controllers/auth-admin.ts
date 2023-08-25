@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
 import { StatusCodes } from "http-status-codes";
-import { BadRequest, CustomError } from "../errors";
+import { BadRequest, CustomError, Unauthenticated } from "../errors";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import pool from "../dbConfig";
@@ -12,6 +12,7 @@ import {
   forgotPasswordEmailTemplate,
   resetPasswordEmailTemplate,
 } from "../utils/helper";
+import { generateKeyPairSync } from "crypto";
 const router = express.Router();
 
 const secretKey: SecretKey = process.env.JWT_SECRET || "";
@@ -72,7 +73,7 @@ const register = async (req: Request, res: Response) => {
 const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
-    // const role='admin';
+
     if (!email || !password) {
       throw new BadRequest('Please provide email and password');
     }
@@ -93,18 +94,35 @@ const login = async (req: Request, res: Response) => {
         throw new BadRequest('Invalid password');
       }
 
-      const payload = { userId: user.id, name: user.fullname,role:user.role };
+   
+      const { publicKey, privateKey } = generateKeyPairSync('rsa', {
+        modulusLength: 2048,
+        publicKeyEncoding: {
+          type: 'spki',
+          format: 'pem',
+        },
+        privateKeyEncoding: {
+          type: 'pkcs8',
+          format: 'pem',
+        },
+      });
+ 
+      const payload = { userId: user.id, name: user.fullname,role:user.role, email: user.email, publicKey };
+
+ 
+      const updatePublicKeyQuery = 'UPDATE admin SET "publicKey" = $1 WHERE id = $2';
+      await client.query(updatePublicKeyQuery, [publicKey, user.id]);
+
+ 
       const token = jwt.sign(payload, secretKey);
 
-      res
-        .status(200)
-        .json({ message: 'Login successful', user: payload, token });
+      res.status(200).json({ message: 'Login successful', user: payload, token });
     } catch (error) {
       throw error;
     } finally {
       client.release();
     }
-  } catch (error: string[] | any) {
+  } catch (error: any) {
     console.error(error);
     res.status(error.status || 500).json({ message: error.message || 'An error occurred' });
   }
@@ -113,8 +131,31 @@ const login = async (req: Request, res: Response) => {
  
 
 
-const logout = (req: Request, res: Response) => {
-  res.status(StatusCodes.OK).send("logout");
+const logout = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    console.log(req.user, 'hello');  
+    if (!userId) {
+      throw new Unauthenticated('User not authenticated');
+    }
+
+   
+
+    const client = await pool.connect();
+    try {
+      const updatePublicKeyQuery = 'UPDATE admin SET "publicKey" = NULL WHERE id = $1';
+      await client.query(updatePublicKeyQuery, [userId]);
+
+      res.status(200).json({ message: 'Logout successful' });
+    } catch (error) {
+      throw error;
+    } finally {
+      client.release();
+    }
+  } catch (error: any) {
+    console.error(error);
+    res.status(error.status || 500).json({ message: error.message || 'An error occurred' });
+  }
 };
 
 const forgotPassword = async (req: Request, res: Response) => {
@@ -218,7 +259,7 @@ const forgotPassword = async (req: Request, res: Response) => {
 //         .status(error.status || 500)
 //         .json({ message: error.message || "An error occurred" });
 //     }
-//   };
+//   }; 
   
  
 

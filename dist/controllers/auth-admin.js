@@ -14,12 +14,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.resetPassword = exports.forgotPassword = exports.logout = exports.login = exports.register = void 0;
 const express_1 = __importDefault(require("express"));
-const http_status_codes_1 = require("http-status-codes");
 const errors_1 = require("../errors");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dbConfig_1 = __importDefault(require("../dbConfig"));
 const helper_1 = require("../utils/helper");
+const crypto_1 = require("crypto");
 const router = express_1.default.Router();
 const secretKey = process.env.JWT_SECRET || "";
 const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -68,7 +68,6 @@ exports.register = register;
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password } = req.body;
-        // const role='admin';
         if (!email || !password) {
             throw new errors_1.BadRequest('Please provide email and password');
         }
@@ -84,11 +83,22 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             if (!passwordMatch) {
                 throw new errors_1.BadRequest('Invalid password');
             }
-            const payload = { userId: user.id, name: user.fullname, role: user.role };
+            const { publicKey, privateKey } = (0, crypto_1.generateKeyPairSync)('rsa', {
+                modulusLength: 2048,
+                publicKeyEncoding: {
+                    type: 'spki',
+                    format: 'pem',
+                },
+                privateKeyEncoding: {
+                    type: 'pkcs8',
+                    format: 'pem',
+                },
+            });
+            const payload = { userId: user.id, name: user.fullname, role: user.role, email: user.email, publicKey };
+            const updatePublicKeyQuery = 'UPDATE admin SET "publicKey" = $1 WHERE id = $2';
+            yield client.query(updatePublicKeyQuery, [publicKey, user.id]);
             const token = jsonwebtoken_1.default.sign(payload, secretKey);
-            res
-                .status(200)
-                .json({ message: 'Login successful', user: payload, token });
+            res.status(200).json({ message: 'Login successful', user: payload, token });
         }
         catch (error) {
             throw error;
@@ -103,9 +113,32 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.login = login;
-const logout = (req, res) => {
-    res.status(http_status_codes_1.StatusCodes.OK).send("logout");
-};
+const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    try {
+        const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
+        console.log(req.user, 'hello');
+        if (!userId) {
+            throw new errors_1.Unauthenticated('User not authenticated');
+        }
+        const client = yield dbConfig_1.default.connect();
+        try {
+            const updatePublicKeyQuery = 'UPDATE admin SET "publicKey" = NULL WHERE id = $1';
+            yield client.query(updatePublicKeyQuery, [userId]);
+            res.status(200).json({ message: 'Logout successful' });
+        }
+        catch (error) {
+            throw error;
+        }
+        finally {
+            client.release();
+        }
+    }
+    catch (error) {
+        console.error(error);
+        res.status(error.status || 500).json({ message: error.message || 'An error occurred' });
+    }
+});
 exports.logout = logout;
 const forgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -193,7 +226,7 @@ exports.forgotPassword = forgotPassword;
 //         .status(error.status || 500)
 //         .json({ message: error.message || "An error occurred" });
 //     }
-//   };
+//   }; 
 const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { token, password } = req.body;

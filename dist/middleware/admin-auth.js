@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const errors_1 = require("../errors");
+const dbConfig_1 = __importDefault(require("../dbConfig"));
 const secretKey = process.env.JWT_SECRET || "";
 const adminAuthMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const authHeader = req.headers.authorization;
@@ -32,12 +33,32 @@ const adminAuthMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0
     }
     try {
         const payload = jsonwebtoken_1.default.verify(token, secretKey);
-        // Check if the user is an admin
         if (payload.role !== 'admin') {
             throw new errors_1.Unauthenticated('Only admins are allowed');
         }
-        req.user = payload;
-        next();
+        const client = yield dbConfig_1.default.connect();
+        try {
+            const userQuery = 'SELECT "publicKey" FROM admin WHERE id = $1';
+            const userResult = yield client.query(userQuery, [payload.userId]);
+            if (userResult.rows.length === 0) {
+                throw new errors_1.Unauthenticated('User not found');
+            }
+            const userPublicKey = userResult.rows[0].publicKey;
+            // console.log(userPublicKey)
+            if (userPublicKey !== payload.publicKey) {
+                throw new errors_1.Unauthenticated('Public key mismatch, retry login');
+            }
+            else {
+                req.user = payload;
+                next();
+            }
+        }
+        catch (error) {
+            throw error;
+        }
+        finally {
+            client.release();
+        }
     }
     catch (error) {
         next(error);

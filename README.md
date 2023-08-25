@@ -21,12 +21,14 @@ The RiseCloud Cloud Backup App API is a backend service that powers a cloud back
 ### User Auth
 - `POST /api/v1/auth/register`: Register a new user account with email, password, and full name.
 - `POST /api/v1/auth/login`: Log in using email and password.
+- `POST /api/v1/auth/logout`: Logout user.
 - `POST /api/v1/auth/forgot-password`: Provide email.
 - `POST /api/v1/auth/reset-password`: Provide new password.
 
 ### Admin Auth
 - `POST /api/v1/auth/admin/register`: Register a new user account with email, password, and full name.
 - `POST /api/v1/auth/admin/login`: Log in using email and password.
+- `POST /api/v1/auth/admin/logout`: Logout user.
 - `POST /api/v1/auth/admin/forgot-password`: Provide email.
 - `POST /api/v1/auth/admin/reset-password`: Provide new password.
 

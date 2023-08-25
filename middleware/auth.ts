@@ -35,7 +35,7 @@ const authMiddleware = async (req: Request, res: Response, next: NextFunction) =
       if (userResult.rows.length === 0) {
         throw new Unauthenticated('User not found');
       }
-
+ 
       const userPublicKey = userResult.rows[0].publicKey;
  
       if (userPublicKey !== payload.publicKey) {
