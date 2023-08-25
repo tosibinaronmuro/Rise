@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import pool from "../dbConfig";
 import nodemailer from "nodemailer";
+import { generateKeyPairSync } from 'crypto';
 import { SecretKey } from "../types";
 import { JwtPayload } from "jsonwebtoken";
 import {
@@ -51,7 +52,7 @@ const register = async (req: Request, res: Response) => {
       const payload = { userId: insertUserResult.rows[0].id, name: fullname ,email:email};
       const token = jwt.sign(payload, secretKey);
 
-      res.status(201).json({ message: 'Registration successful', user: payload, token });
+      res.status(201).json({ message: 'Registration successful', user: payload });
     } catch (error) {
       await client.query('ROLLBACK');
       throw error;
@@ -63,7 +64,8 @@ const register = async (req: Request, res: Response) => {
     res.status(error.status || 500).json({ message: error.message || 'An error occurred' });
   }
 };
-
+//  add a public_key column to the users // usertable should have public key and uploads 
+//the uploads would contain their userid, fullname and link to the bucket holding the value
 const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
@@ -88,8 +90,26 @@ const login = async (req: Request, res: Response) => {
         throw new BadRequest('Invalid password');
       }
 
+   
+      const { publicKey, privateKey } = generateKeyPairSync('rsa', {
+        modulusLength: 2048,
+        publicKeyEncoding: {
+          type: 'spki',
+          format: 'pem',
+        },
+        privateKeyEncoding: {
+          type: 'pkcs8',
+          format: 'pem',
+        },
+      });
+ 
+      const payload = { userId: user.id, name: user.fullname, email: user.email, publicKey };
 
-      const payload = { userId: user.id, name: user.fullname ,email:user.email};
+ 
+      const updatePublicKeyQuery = 'UPDATE users SET "publicKey" = $1 WHERE id = $2';
+      await client.query(updatePublicKeyQuery, [publicKey, user.id]);
+
+ 
       const token = jwt.sign(payload, secretKey);
 
       res.status(200).json({ message: 'Login successful', user: payload, token });
@@ -98,11 +118,12 @@ const login = async (req: Request, res: Response) => {
     } finally {
       client.release();
     }
-  } catch (error: string[] | any) {
+  } catch (error: any) {
     console.error(error);
     res.status(error.status || 500).json({ message: error.message || 'An error occurred' });
   }
 };
+
 
  
  

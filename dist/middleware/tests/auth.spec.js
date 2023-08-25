@@ -33,7 +33,7 @@ describe('authMiddleware', () => {
         expect(mockNext).not.toHaveBeenCalled();
     });
     it('should call next if token is valid', () => {
-        const mockPayload = { userId: '123', name: 'John' };
+        const mockPayload = { userId: '123', name: 'John', email: 'dnkbsjb', id: 's' };
         const mockToken = 'validToken';
         mockReq.headers = { authorization: `Bearer ${mockToken}` };
         jsonwebtoken_1.default.verify = jest.fn().mockReturnValue(mockPayload);

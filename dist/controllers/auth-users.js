@@ -19,6 +19,7 @@ const errors_1 = require("../errors");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dbConfig_1 = __importDefault(require("../dbConfig"));
+const crypto_1 = require("crypto");
 const helper_1 = require("../utils/helper");
 const router = express_1.default.Router();
 const secretKey = process.env.JWT_SECRET || "";
@@ -46,7 +47,7 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             yield client.query('COMMIT');
             const payload = { userId: insertUserResult.rows[0].id, name: fullname, email: email };
             const token = jsonwebtoken_1.default.sign(payload, secretKey);
-            res.status(201).json({ message: 'Registration successful', user: payload, token });
+            res.status(201).json({ message: 'Registration successful', user: payload });
         }
         catch (error) {
             yield client.query('ROLLBACK');
@@ -62,6 +63,8 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.register = register;
+//  add a public_key column to the users // usertable should have public key and uploads 
+//the uploads would contain their userid, fullname and link to the bucket holding the value
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password } = req.body;
@@ -80,7 +83,20 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             if (!passwordMatch) {
                 throw new errors_1.BadRequest('Invalid password');
             }
-            const payload = { userId: user.id, name: user.fullname, email: user.email };
+            const { publicKey, privateKey } = (0, crypto_1.generateKeyPairSync)('rsa', {
+                modulusLength: 2048,
+                publicKeyEncoding: {
+                    type: 'spki',
+                    format: 'pem',
+                },
+                privateKeyEncoding: {
+                    type: 'pkcs8',
+                    format: 'pem',
+                },
+            });
+            const payload = { userId: user.id, name: user.fullname, email: user.email, publicKey };
+            const updatePublicKeyQuery = 'UPDATE users SET "publicKey" = $1 WHERE id = $2';
+            yield client.query(updatePublicKeyQuery, [publicKey, user.id]);
             const token = jsonwebtoken_1.default.sign(payload, secretKey);
             res.status(200).json({ message: 'Login successful', user: payload, token });
         }

@@ -38,7 +38,7 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             if (emailExistsResult.rows.length > 0) {
                 throw new errors_1.BadRequest('Email already exists');
             }
-            const insertUserQuery = 'INSERT INTO admin (fullname, email, password,role) VALUES ($1, $2, $3,$4) RETURNING id';
+            const insertUserQuery = 'INSERT INTO admin (fullname, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id';
             const insertUserResult = yield client.query(insertUserQuery, [
                 fullname,
                 email,
@@ -49,7 +49,7 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             yield client.query('COMMIT');
             const payload = { userId: insertUserResult.rows[0].id, name: fullname, role: role };
             const token = jsonwebtoken_1.default.sign(payload, secretKey);
-            res.status(201).json({ message: 'Registration successful', user: payload, token });
+            res.status(201).json({ message: 'Registration successful', user: payload });
         }
         catch (error) {
             yield client.query('ROLLBACK');

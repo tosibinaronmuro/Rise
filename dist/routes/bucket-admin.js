@@ -12,4 +12,5 @@ const router = express_1.default.Router();
 router.route('/delete/:fileName').delete(googleCloudAdmin_1.deleteFile);
 router.route('/delete-folder/:folderName').delete(googleCloudAdmin_1.deleteFolder);
 router.route('/get-all-files').get(googleCloudAdmin_1.getAllFiles);
+router.route('/terminate-session/:userId').put(googleCloudAdmin_1.invalidatePublicKey);
 exports.default = router;

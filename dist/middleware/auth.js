@@ -14,7 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const errors_1 = require("../errors");
-const secretKey = process.env.JWT_SECRET || "";
+const dbConfig_1 = __importDefault(require("../dbConfig"));
+const secretKey = process.env.JWT_SECRET || '';
 const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer')) {
@@ -32,8 +33,26 @@ const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
     }
     try {
         const payload = jsonwebtoken_1.default.verify(token, secretKey);
-        req.user = payload;
-        next();
+        const client = yield dbConfig_1.default.connect();
+        try {
+            const userQuery = 'SELECT "publicKey" FROM users WHERE id = $1';
+            const userResult = yield client.query(userQuery, [payload.userId]);
+            if (userResult.rows.length === 0) {
+                throw new errors_1.Unauthenticated('User not found');
+            }
+            const userPublicKey = userResult.rows[0].publicKey;
+            if (userPublicKey !== payload.publicKey) {
+                throw new errors_1.Unauthenticated('Public key mismatch, retry login');
+            }
+            req.user = payload;
+            next();
+        }
+        catch (error) {
+            throw error;
+        }
+        finally {
+            client.release();
+        }
     }
     catch (error) {
         next(error);

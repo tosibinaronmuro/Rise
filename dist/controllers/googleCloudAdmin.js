@@ -12,13 +12,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllFiles = exports.deleteFolder = exports.deleteFile = void 0;
+exports.invalidatePublicKey = exports.getAllFiles = exports.deleteFolder = exports.deleteFile = void 0;
 const storage_1 = require("@google-cloud/storage");
 const path_1 = __importDefault(require("path"));
+const dbConfig_1 = __importDefault(require("../dbConfig"));
+const errors_1 = require("../errors");
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const gc = new storage_1.Storage({
     keyFilename: path_1.default.join(__dirname, `../../${process.env.GOOGLE_KEY_FILE_NAME}`),
     projectId: `${process.env.GOOGLE_PROJECT_ID}`,
 });
+const secretKey = process.env.JWT_SECRET || "";
 const risecloudBucket = gc.bucket("risecloud");
 const deleteFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -81,3 +85,41 @@ const getAllFiles = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.getAllFiles = getAllFiles;
+const invalidatePublicKey = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const adminToken = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(" ")[1];
+    if (!adminToken) {
+        throw new errors_1.Unauthenticated("Admin authentication required");
+    }
+    try {
+        const adminPayload = jsonwebtoken_1.default.verify(adminToken, secretKey);
+        if (adminPayload.role !== "admin") {
+            throw new errors_1.Unauthenticated("Admin authentication required");
+        }
+        const userId = req.params.userId;
+        const client = yield dbConfig_1.default.connect();
+        try {
+            const userQuery = "SELECT * FROM users WHERE id = $1";
+            const userResult = yield client.query(userQuery, [userId]);
+            const user = userResult.rows[0];
+            if (userResult.rows.length === 0) {
+                throw new errors_1.NotFound("User not found");
+            }
+            const updateQuery = 'UPDATE users SET "publicKey" = NULL WHERE id = $1';
+            yield client.query(updateQuery, [userId]);
+            res
+                .status(200)
+                .json({ message: `PublicKey invalidated for  ${user.fullname} ` });
+        }
+        catch (error) {
+            throw error;
+        }
+        finally {
+            client.release();
+        }
+    }
+    catch (error) {
+        throw error;
+    }
+});
+exports.invalidatePublicKey = invalidatePublicKey;

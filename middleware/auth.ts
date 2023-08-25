@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt, { JwtPayload } from 'jsonwebtoken'; 
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import { Unauthenticated } from '../errors';
-import  {Payload, SecretKey } from 'types';
+import { Payload, SecretKey } from 'types';
+import pool from "../dbConfig";
 
-
-const secretKey: SecretKey = process.env.JWT_SECRET || "";
+const secretKey: SecretKey = process.env.JWT_SECRET || '';
 
 const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
@@ -23,15 +23,35 @@ const authMiddleware = async (req: Request, res: Response, next: NextFunction) =
   if (!token) {
     throw new Unauthenticated('Authentication invalid');
   }
+
   try {
     const payload = jwt.verify(token, secretKey) as Payload;
-     
-    req.user = payload;  
-    next();
+ 
+    const client = await pool.connect();
+    try {
+      const userQuery = 'SELECT "publicKey" FROM users WHERE id = $1';
+      const userResult = await client.query(userQuery, [payload.userId]);
+
+      if (userResult.rows.length === 0) {
+        throw new Unauthenticated('User not found');
+      }
+
+      const userPublicKey = userResult.rows[0].publicKey;
+ 
+      if (userPublicKey !== payload.publicKey) {
+        throw new Unauthenticated('Public key mismatch, retry login');
+      }
+
+      req.user = payload;
+      next();
+    } catch (error) {
+      throw error;
+    } finally {
+      client.release();
+    }
   } catch (error) {
-    next(error)
+    next(error);
   }
-   
 };
 
 export default authMiddleware;

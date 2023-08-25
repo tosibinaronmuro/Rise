@@ -38,7 +38,7 @@ describe('authMiddleware', () => {
   });
 
   it('should call next if token is valid', () => {
-    const mockPayload: Payload = { userId: '123', name: 'John' };
+    const mockPayload: Payload = { userId: '123', name: 'John',email:'dnkbsjb', id:'s' };
     const mockToken = 'validToken';
 
     mockReq.headers = { authorization: `Bearer ${mockToken}` };
