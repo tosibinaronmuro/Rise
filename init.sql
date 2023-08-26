@@ -1,8 +1,8 @@
 -- Create the risecloud database
-CREATE DATABASE risecloud;
+-- CREATE DATABASE risecloudd;
 
 -- Switch to the new database
-\c risecloud;
+\c risecloudd;
 
 -- Create users table
 CREATE TABLE users (
@@ -10,6 +10,7 @@ CREATE TABLE users (
     fullname VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
+    role VARCHAR(255) NOT NULL,
     publicKey VARCHAR(255)
 );
 
