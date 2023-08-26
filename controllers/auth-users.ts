@@ -17,11 +17,11 @@ const router = express.Router();
 
 const secretKey: SecretKey = process.env.JWT_SECRET || "";
 
-
+ 
 const register = async (req: Request, res: Response) => {
   try {
     const { fullname, email, password } = req.body;
-
+    const role = 'user';
     if (!fullname || !email || !password) {
       throw new BadRequest('Please provide name, email, and password');
     }
@@ -40,16 +40,17 @@ const register = async (req: Request, res: Response) => {
       }
 
       const insertUserQuery =
-        'INSERT INTO users (fullname, email, password) VALUES ($1, $2, $3) RETURNING id';
+        'INSERT INTO users (fullname, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id';
       const insertUserResult = await client.query(insertUserQuery, [
         fullname,
         email,
         hashedPassword,
+        role
       ]);
 
       await client.query('COMMIT');
 
-      const payload = { userId: insertUserResult.rows[0].id, name: fullname ,email:email};
+      const payload = { userId: insertUserResult.rows[0].id, name: fullname ,email:email,  role: role};
       const token = jwt.sign(payload, secretKey);
 
       res.status(201).json({ message: 'Registration successful', user: payload });
@@ -102,7 +103,7 @@ const login = async (req: Request, res: Response) => {
         },
       });
  
-      const payload = { userId: user.id, name: user.fullname, email: user.email, publicKey };
+      const payload = { userId: user.id, name: user.fullname, email: user.email, role:user.role, publicKey };
 
  
       const updatePublicKeyQuery = 'UPDATE users SET "publicKey" = $1 WHERE id = $2';

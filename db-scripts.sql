@@ -4,6 +4,7 @@ CREATE TABLE users (
     fullname VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
+    role VARCHAR(255) NOT NULL,
     publicKey VARCHAR(255)  
 );
 --Create admin table

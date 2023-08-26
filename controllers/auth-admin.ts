@@ -30,7 +30,7 @@ const register = async (req: Request, res: Response) => {
 
     const client = await pool.connect();
     try {
-      await client.query('BEGIN');
+      await client.query('BEGIN'); 
 
       const emailExistsQuery = 'SELECT * FROM admin WHERE email = $1';
       const emailExistsResult = await client.query(emailExistsQuery, [email]);

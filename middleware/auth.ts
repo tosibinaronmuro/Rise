@@ -23,10 +23,13 @@ const authMiddleware = async (req: Request, res: Response, next: NextFunction) =
   if (!token) {
     throw new Unauthenticated('Authentication invalid');
   }
-
+ 
   try {
     const payload = jwt.verify(token, secretKey) as Payload;
- 
+    
+    if (payload.role !== 'user') {
+      throw new Unauthenticated('Only Users are allowed, create a user account and login');
+    }
     const client = await pool.connect();
     try {
       const userQuery = 'SELECT "publicKey" FROM users WHERE id = $1';
