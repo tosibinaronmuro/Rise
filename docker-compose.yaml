@@ -14,4 +14,4 @@ services:
       - "13000:8000"
     depends_on:
       - db
-    command: sh -c "sleep 10 && npm run dev"
+    command: sh -c "sleep 10 && npm run start"
