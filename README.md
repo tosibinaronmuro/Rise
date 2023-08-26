@@ -8,11 +8,31 @@ The RiseCloud Cloud Backup App API is a backend service that powers a cloud back
 
 - User Registration: Users can create accounts with their email address, password, and full name.
 - User login: Users can login to their accounts with their email address and password.
+- User logout: Users can logout to their accounts.
 - User forgot-password: Users can initiate a forgot password feature which sends an authentication token to their provided emails.
 - User reset-password: Users can reset their passwords by providing the authenticated token sent to their email and thereafter receive a confirmatory email.
-- Account Authentication: Users can log in securely using their registered credentials.
-- Secure Backup Storage: User files and data are securely stored in the cloud.
+- Upload files: Users can upload files, photos and videos of not more than 200mb.
+- Download files: Users can download files they save.
+- Stream photos and videos: Users can stream photos and videos from the cloud.
+- View upload history: Users can view their upload history.
 - Account Management: Users can manage their account details, including password reset.
+- Delete files: Users can delete files they created.
+- View Files: Users can view all the files they created.
+
+- Admin Registration: Admins can create accounts with their email address, password, and full name.
+- Admin login: Admins can login to their accounts with their email address and password.
+- Admin logout: Admins can logout of their accounts  
+- Admin forgot-password: Adsmin can initiate a forgot password feature which sends an authentication token to their provided emails.
+- Admin reset-password: Admins can reset their passwords by providing the authenticated token sent to their email and thereafter receive a confirmatory email.
+- Revokable session management: Admins can revoke the sessions of users with their id.
+- View upload history: Admins can view the upload history of the entire application as well as the upload history of a single user.
+- View Files: Admins can view all the files of the entire application.
+- View Users: Admins can view all the active users of the app.
+- Delete unsafe files: Admins can delete files and folders created by any user deemed unsafe
+- Account Authentication: Admins can log in securely using their registered credentials.
+
+- Secure Backup Storage: User files and data are securely stored in the cloud.
+- Account Management: Admins can manage their account details, including password reset.
 - API Testing: Comprehensive unit tests are implemented using Jest.
 - more features coming soon
 
