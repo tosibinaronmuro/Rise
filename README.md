@@ -40,21 +40,30 @@ The RiseCloud Cloud Backup App API is a backend service that powers a cloud back
 - `GET /api/v1/bucket/download/:folderName/:fileName`: download a file from a specidied folder 
 - `GET /api/v1/bucket/get-all-files`: Get all files created by the user 
 - `DELETE /api/v1/bucket/delete/:fileName`: Delete a file created by the user 
+- `GET /api/v1/admin/bucket/history`: Get all upload history of the user
 
 ### Admin   functionalities
 - `DELETE /api/v1/admin/bucket/delete/:fileName`: Delete a file 
 - `DELETE /api/v1/admin/bucket/delete-folder/:folderName`: Delete a folder and all files in it... Should be used with caution 
 - `GET /api/v1/admin/bucket/get-all-files`: Get all files 
+- `GET /api/v1/admin/bucket/history`: Get all upload history
+- `GET /api/v1/admin/bucket/history/:userId`: Get all upload history by a user
+- `GET /api/v1/admin/bucket/get-all-users`: Get all registered users 
 - `PUT /api/v1/admin/bucket/terminate-session/:userId`: Allows the Admin to revoke a users session 
 
+ 
+## Database Setup:
 
-- More endpoints  cominig soon
+   - Open pgAdmin and connect to your PostgreSQL server.
+   - Create a new database named "risecloud".
+   - Connect to the "risecloud" database.
+   - Manually create the necessary tables using SQL scripts provided in the `database-scripts` folder.
 
 ## Prerequisites
 
 - Node.js (v14 or higher)
 - PostgreSQL database
-- Docker (optional for containerization)
+- Docker (for containerization)
 - Postman (for API testing)
 
 ## Installation
@@ -88,11 +97,16 @@ DB_PASSWORD=your-db-password
 DB_DATABASE=your-db-name
 
 # JWT secret key
-SECRET_KEY=your-secret-key
+JWT_SECRET=your-secret-key
 
 # Google client
 MY_PASSWORD=your-secret-key
-MY_EMAIL=your-semail
+MY_EMAIL=your-email
+GOOGLE_KEY_FILE_NAME=your-key-file-name
+GOOGLE_PROJECT_ID=your-project-id
+
+#Download link
+CONTENT_BASE_URL=http://${your-base-url}/api/v1/bucket/download
 ```
 
 5. Set up your PostgreSQL database with the provided configuration.
@@ -124,21 +138,20 @@ npm run test
 
 You can find a Postman collection with example API requests in the `postman` directory. Import this collection into Postman to test the API endpoints.
 
-## Dockerization (Optional)
+## Dockerization 
 
-The API will eventually be containerized using Docker. A Dockerfile is provided in the repository. To build and run the Docker container:
+The API is containerized using Docker. A Dockerfile is provided in the repository. To build and run the Docker container:
 
 ```bash
-docker build -t risecloud-api .
-docker run -p 3000:3000 -d risecloud-api
+docker build -t rise-cloud-node .
+docker run -p 13000:8000 -d rise-cloud-node
 ```
 
 ## Contributing
 
 Contributions to this project are welcome! Feel free to submit issues and pull requests.
 Also a list of possible upgrades/features are:
--make the reset password token a one time token  
--implement user id for all create, delete and get routes
+-implement file compression
 For any inquiries or questions, feel free to contact [tosironj@gmail.com](mailto:tosironj@gmail.com).
 ## License
 

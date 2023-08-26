@@ -25,5 +25,5 @@ app.use(errors_handler_1.default);
 app.use(not_found_1.default);
 const port = process.env.PORT || 8000;
 app.listen(port, () => {
-    console.log(`app is listening on port ${port}`);
+    console.log(`app is listening on ports ${port}`, process.env.DB_PASSWORD, process.env.DB_HOST, process.env.DB_USER);
 });

@@ -73,15 +73,38 @@ const uploadFile = async (req: Request, res: Response) => {
       VALUES ($1, $2, $3, $4, $5)
     `;
     
-    await pool.query(insertQuery, [
-      createdBy.userId,
-      createdBy.name,
-      createdBy.email,
-      fileKey,
-      `${process.env.CONTENT_BASE_URL}/${fileKey}`, 
-    
-    ]);
-    
+    try {
+      const result = await pool.query(insertQuery, [
+        createdBy.userId,
+        createdBy.name,
+        createdBy.email,
+        fileKey,
+        `${process.env.CONTENT_BASE_URL}/${fileKey}`,
+      ]);
+      console.log("Upload inserted into uploads table:", result.rows[0]);
+    } catch (error) {
+      console.error("Error inserting into uploads table:", error);
+    }
+  
+    const historyInsertQuery = `
+      INSERT INTO history (email, fullname, filename, userid, date, "timestamp", filelink)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+    `;
+    try {
+      const historyResult = await pool.query(historyInsertQuery, [
+        createdBy.email,
+        createdBy.name,
+        fileKey,
+        createdBy.userId,
+        new Date(),
+        new Date().toISOString(),
+        `${process.env.CONTENT_BASE_URL}/${fileKey}`,
+      ]);
+      console.log("Upload inserted into history table:", historyResult.rows[0]);
+    } catch (error) {
+      console.error("Error inserting into history table:", error);
+    }
+  
 
       console.log(`File ${destinationFileName} uploaded to bucket and database`);
 
@@ -247,5 +270,27 @@ const deleteFile = async (req: Request, res: Response) => {
   }
 };
 
+const getFileHistory = async (req: Request, res: Response) => {
+  try {
+    const userId = (req.user as Payload).userId;  
 
-export { uploadFile, downloadFile, createFolder,getAllFiles ,deleteFile};
+    const query = `
+      SELECT * FROM history
+      WHERE userid = $1
+      ORDER BY date DESC;
+    `;
+
+    const result = await pool.query(query, [userId]);
+    const fileHistory = result.rows;
+
+    return res.status(200).json(fileHistory);
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: 'An error occurred while fetching file history' });
+  }
+};
+
+
+export { uploadFile, downloadFile, createFolder,getAllFiles ,deleteFile, getFileHistory};

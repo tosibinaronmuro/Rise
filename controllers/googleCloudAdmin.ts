@@ -160,4 +160,64 @@ const invalidatePublicKey = async (req: Request, res: Response) => {
   }
 };
 
-export { deleteFile, deleteFolder, getAllFiles, invalidatePublicKey };
+
+const getAdminFileHistory = async (req: Request, res: Response) => {
+  try {
+    
+    const query = `
+      SELECT * FROM history
+      ORDER BY date DESC;
+    `;
+
+    const result = await pool.query(query);
+    const fileHistory = result.rows;
+
+    return res.status(200).json(fileHistory);
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: 'An error occurred while fetching file history' });
+  }
+};
+
+const getAdminUserFileHistory = async (req: Request, res: Response) => {
+  try {
+    
+    const userId = req.params.userId;
+
+    const query = `
+      SELECT * FROM history
+      WHERE userid = $1
+      ORDER BY date DESC;
+    `;
+
+    const result = await pool.query(query, [userId]);
+    const userFileHistory = result.rows;
+
+    return res.status(200).json(userFileHistory);
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: 'An error occurred while fetching user file history' });
+  }
+};
+ 
+const getAllUsers = async (req: Request, res: Response) => {
+  try {
+    
+
+    const query = 'SELECT id, fullname, email FROM users';
+    const result = await pool.query(query);
+
+    const users = result.rows;
+
+    res.status(200).json(users);
+  } catch (error: any) {
+    console.error(error);
+    res.status(error.status || 500).json({ message: error.message || 'An error occurred' });
+  }
+};
+
+export { deleteFile, deleteFolder, getAllFiles, invalidatePublicKey ,getAdminFileHistory, getAdminUserFileHistory, getAllUsers};
