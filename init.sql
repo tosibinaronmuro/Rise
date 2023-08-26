@@ -1,20 +1,26 @@
---Create users table
+-- Create the risecloud database
+CREATE DATABASE risecloud;
+
+-- Switch to the new database
+\c risecloud;
+
+-- Create users table
 CREATE TABLE users (
     id bigserial PRIMARY KEY,
     fullname VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    role VARCHAR(255) NOT NULL,
-    publicKey VARCHAR(255)  
+    publicKey VARCHAR(255)
 );
---Create admin table
+
+-- Create admin table
 CREATE TABLE admin (
     id bigserial PRIMARY KEY,
     fullname VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     role VARCHAR(255) NOT NULL,
-    publicKey VARCHAR(255)  
+    publicKey VARCHAR(255)
 );
 
 -- Create the uploads table
@@ -24,12 +30,11 @@ CREATE TABLE uploads (
     fullname VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
     filename VARCHAR(255) NOT NULL,
-    filelink VARCHAR(255) NOT NULL 
+    filelink VARCHAR(255) NOT NULL
 );
 
---Create a history table
-CREATE TABLE history
-(
+-- Create a history table
+CREATE TABLE history (
     email character varying(255) NOT NULL,
     id bigserial NOT NULL,
     fullname character varying(255) NOT NULL,

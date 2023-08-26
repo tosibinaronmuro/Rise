@@ -6,6 +6,8 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_DB: ${DB_HOST}
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
   app:
     image: rise-cloud-node
     ports:
