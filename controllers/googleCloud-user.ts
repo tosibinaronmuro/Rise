@@ -78,7 +78,8 @@ const uploadFile = async (req: Request, res: Response) => {
       createdBy.name,
       createdBy.email,
       fileKey,
-      `https://storage.googleapis.com/risecloud/${fileKey}`, 
+      `${process.env.CONTENT_BASE_URL}/${fileKey}`, 
+    
     ]);
     
 
@@ -113,7 +114,8 @@ const downloadFile = async (req: Request, res: Response) => {
     const fileName = req.params.fileName;
     const folderName = req.params.folderName;
     const filePath = folderName ? `${folderName}/${fileName}` : fileName;
-    const file = risecloudBucket.file(filePath);
+const encodedFilePath=decodeURIComponent(filePath);
+    const file = risecloudBucket.file(encodedFilePath);
     console.log("file: ", file);
     const extension = path.extname(fileName);
 
@@ -124,7 +126,7 @@ const downloadFile = async (req: Request, res: Response) => {
       ".mp4": "video/mp4",
       ".mov": "video/quicktime",
       ".avi": "video/x-msvideo",
-    };
+    };  
 
     const contentType = contentTypeMap[extension] || "application/octet-stream";
 

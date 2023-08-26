@@ -62,8 +62,6 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.register = register;
-//  add a public_key column to the users // usertable should have public key and uploads 
-//the uploads would contain their userid, fullname and link to the bucket holding the value
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password } = req.body;

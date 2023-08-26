@@ -64,8 +64,7 @@ const register = async (req: Request, res: Response) => {
     res.status(error.status || 500).json({ message: error.message || 'An error occurred' });
   }
 };
-//  add a public_key column to the users // usertable should have public key and uploads 
-//the uploads would contain their userid, fullname and link to the bucket holding the value
+ 
 const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;

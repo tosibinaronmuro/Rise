@@ -76,7 +76,7 @@ const uploadFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 createdBy.name,
                 createdBy.email,
                 fileKey,
-                `https://storage.googleapis.com/risecloud/${fileKey}`,
+                `${process.env.CONTENT_BASE_URL}/${fileKey}`,
             ]);
             console.log(`File ${destinationFileName} uploaded to bucket and database`);
             return res.status(201).json({ message: "File uploaded successfully" });
@@ -106,7 +106,8 @@ const downloadFile = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         const fileName = req.params.fileName;
         const folderName = req.params.folderName;
         const filePath = folderName ? `${folderName}/${fileName}` : fileName;
-        const file = risecloudBucket.file(filePath);
+        const encodedFilePath = decodeURIComponent(filePath);
+        const file = risecloudBucket.file(encodedFilePath);
         console.log("file: ", file);
         const extension = path_1.default.extname(fileName);
         // Content type mapping
