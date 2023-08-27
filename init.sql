@@ -1,8 +1,8 @@
 -- Create the risecloud database
--- CREATE DATABASE risecloudd;
+-- CREATE DATABASE risecloud;
 
 -- Switch to the new database
-\c risecloudd;
+\c risecloud;
 
 -- Create users table
 CREATE TABLE users (
