@@ -1,10 +1,8 @@
-import { Request, Response } from "express";
-import express from "express";
 import { Storage } from "@google-cloud/storage";
-import { Readable } from "stream";
+import { Request, Response } from "express";
 import path from "path";
+import { Readable } from "stream";
 import { Payload } from "types";
-import StorageError from "../errors/storageError";
 import pool from "../dbConfig";
 
 const gc = new Storage({
@@ -81,7 +79,7 @@ const uploadFile = async (req: Request, res: Response) => {
         fileKey,
         `${process.env.CONTENT_BASE_URL}/${fileKey}`,
       ]);
-      console.log("Upload inserted into uploads table:", result.rows[0]);
+      
     } catch (error) {
       console.error("Error inserting into uploads table:", error);
     }
@@ -100,7 +98,7 @@ const uploadFile = async (req: Request, res: Response) => {
         new Date().toISOString(),
         `${process.env.CONTENT_BASE_URL}/${fileKey}`,
       ]);
-      console.log("Upload inserted into history table:", historyResult.rows[0]);
+    
     } catch (error) {
       console.error("Error inserting into history table:", error);
     }
@@ -118,7 +116,7 @@ const uploadFile = async (req: Request, res: Response) => {
         .json({ message: "An error occurred while uploading the file" });
     });
 
-    // Pipe the file buffer into the writable stream
+  
     const readableStream = new Readable();
     readableStream.push(fileBuffer);
     readableStream.push(null);
@@ -142,7 +140,6 @@ const encodedFilePath=decodeURIComponent(filePath);
     console.log("file: ", file);
     const extension = path.extname(fileName);
 
-    // Content type mapping
     const contentTypeMap: Record<string, string> = {
       ".pdf": "application/pdf",
       ".png": "image/png",
@@ -293,4 +290,5 @@ const getFileHistory = async (req: Request, res: Response) => {
 };
 
 
-export { uploadFile, downloadFile, createFolder,getAllFiles ,deleteFile, getFileHistory};
+export { createFolder, deleteFile, downloadFile, getAllFiles, getFileHistory, uploadFile };
+

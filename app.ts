@@ -1,13 +1,14 @@
-import express, { Express, Request, Response,NextFunction } from "express"
-const app:Express=express()
+import express, { Express, Request, Response } from "express"
+import adminAuthMiddleware from './middleware/admin-auth'
+import authMiddleware from './middleware/auth'
 import errorHandler from "./middleware/errors-handler"
 import notFoundHandler from "./middleware/not-found"
 import authRouter from "./routes/auth"
 import authAdminRouter from "./routes/auth-admin"
 import bucketRouter from "./routes/bucket"
 import bucketAdminRouter from "./routes/bucket-admin"
-import authMiddleware from './middleware/auth';
-import adminAuthMiddleware from './middleware/admin-auth';
+import helmet from "helmet"
+const app:Express=express()
 
  app.use(express.json())
 app.use("/api/v1/auth", authRouter); 
@@ -17,9 +18,19 @@ app.use("/api/v1/admin/bucket", adminAuthMiddleware, bucketAdminRouter);
 
 
  app.get('/', (req:Request,res:Response)=>{
-    res.status(200).send('testing typescript which works and testing automation ')
+    res.status(200).send('Risecloud api base URL ')
  })
-  
+//  app.set("trust proxy", 1);
+//  app.use(
+//    rateLimiter({
+//      windowMs: 15 * 60 * 1000,
+//      max: 60,
+//      message: 'Too many requests to this endpoint. Please try again later.'
+//    })
+//  );
+//  app.use(helmet());
+ 
+ 
  app.use(errorHandler)
  app.use(notFoundHandler)
  

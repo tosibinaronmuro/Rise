@@ -1,8 +1,8 @@
-import { Request, Response, NextFunction } from 'express';
-import jwt, { JwtPayload } from 'jsonwebtoken';
-import { Unauthenticated } from '../errors';
+import { NextFunction, Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
 import { Payload, SecretKey } from 'types';
 import pool from "../dbConfig";
+import { Unauthenticated } from '../errors';
 
 const secretKey: SecretKey = process.env.JWT_SECRET || '';
 

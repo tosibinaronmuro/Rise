@@ -1,12 +1,10 @@
-import { Request, Response } from "express";
-import express from "express";
 import { Storage } from "@google-cloud/storage";
-import { Readable } from "stream";
+import { Request, Response } from "express";
+import jwt from "jsonwebtoken";
 import path from "path";
 import { Payload, SecretKey } from "types";
 import pool from "../dbConfig";
 import { NotFound, Unauthenticated } from "../errors";
-import jwt from "jsonwebtoken";
 
 const gc = new Storage({
   keyFilename: path.join(
@@ -220,4 +218,4 @@ const getAllUsers = async (req: Request, res: Response) => {
   }
 };
 
-export { deleteFile, deleteFolder, getAllFiles, invalidatePublicKey ,getAdminFileHistory, getAdminUserFileHistory, getAllUsers};
+export { deleteFile, deleteFolder, getAdminFileHistory, getAdminUserFileHistory, getAllFiles, getAllUsers, invalidatePublicKey };
