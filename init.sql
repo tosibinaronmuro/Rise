@@ -37,12 +37,12 @@ CREATE TABLE uploads (
 -- Create a history table
 CREATE TABLE history (
     email character varying(255) NOT NULL,
-    id bigserial NOT NULL,
+    id bigserial PRIMARY KEY ,
     fullname character varying(255) NOT NULL,
     filename character varying(255) NOT NULL,
     userid character varying(255) NOT NULL,
     date date,
     "timestamp" character varying,
     filelink character varying,
-    PRIMARY KEY (id)
+    
 );
