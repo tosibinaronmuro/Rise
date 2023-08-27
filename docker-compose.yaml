@@ -15,3 +15,5 @@ services:
     depends_on:
       - db
     command: sh -c "sleep 10 && npm run start"
+    links:
+      - db
