@@ -12,8 +12,5 @@ services:
     image: rise-cloud-node
     ports:
       - "13000:8000"
-    depends_on:
-      - db
-    command: sh -c "sleep 10 && npm run start"
     links:
       - db
