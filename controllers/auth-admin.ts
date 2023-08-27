@@ -1,19 +1,15 @@
-import express, { Request, Response, NextFunction } from "express";
-import { StatusCodes } from "http-status-codes";
-import { BadRequest, CustomError, Unauthenticated } from "../errors";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import express, { Request, Response } from "express";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import pool from "../dbConfig";
-import nodemailer from "nodemailer";
+import { BadRequest, Unauthenticated } from "../errors";
 import { SecretKey } from "../types";
-import { JwtPayload } from "jsonwebtoken";
+import { generatePublicKey } from "../utils/encryption";
 import {
-  mailTransport,
   forgotPasswordEmailTemplate,
+  mailTransport,
   resetPasswordEmailTemplate,
 } from "../utils/helper";
-import { generateKeyPairSync } from "crypto";
-import { generatePublicKey } from "utils/encryption";
 const router = express.Router();
 
 const secretKey: SecretKey = process.env.JWT_SECRET || "";
@@ -311,4 +307,5 @@ const resetPassword = async (req: Request, res: Response) => {
   }
 };
 
-export { register, login, logout, forgotPassword, resetPassword };
+export { forgotPassword, login, logout, register, resetPassword };
+
