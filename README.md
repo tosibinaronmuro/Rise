@@ -71,13 +71,6 @@ The RiseCloud Cloud Backup App API is a backend service that powers a cloud back
 - `GET /api/v1/admin/bucket/get-all-users`: Get all registered users 
 - `PUT /api/v1/admin/bucket/terminate-session/:userId`: Allows the Admin to revoke a users session 
 
- 
-## Database Setup:
-
-   - Open pgAdmin and connect to your PostgreSQL server.
-   - Create a new database named "risecloud".
-   - Connect to the "risecloud" database.
-   - Manually create the necessary tables using SQL scripts provided in the `database-scripts` folder.
 
 ## Prerequisites
 
@@ -86,7 +79,7 @@ The RiseCloud Cloud Backup App API is a backend service that powers a cloud back
 - Docker (for containerization)
 - Postman (for API testing)
 
-## Installation
+## Installation (manual)
 
 1. Clone the repository:
 
@@ -129,7 +122,12 @@ GOOGLE_PROJECT_ID=your-project-id
 CONTENT_BASE_URL=http://${your-base-url}/api/v1/bucket/download
 ```
 
-5. Set up your PostgreSQL database with the provided configuration.
+5. Database Setup:
+
+   - Open pgAdmin and connect to your PostgreSQL server.
+   - Create a new database named "risecloud".
+   - Connect to the "risecloud" database.
+   - Manually create the necessary tables using SQL scripts provided in the `database-scripts` folder.
 
 6. Run database migrations:
 
@@ -158,7 +156,7 @@ npm run test
 
 You can find a Postman collection with example API requests in the `postman` directory. Import this collection into Postman to test the API endpoints.
 
-## Dockerization 
+## Installation ( Docker) 
 
 The API is containerized using Docker. A Dockerfile is provided in the repository. To build and run the Docker container:
 
