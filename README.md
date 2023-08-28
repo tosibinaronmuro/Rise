@@ -4,6 +4,9 @@
 
 The RiseCloud Cloud Backup App API is a backend service that powers a cloud backup system. It allows users to securely create accounts and manage their backups in the cloud. This API is built using TypeScript, Node.js, Express, PostgreSQL, and Jest for testing.
 
+## Links
+-Hosted API Base URL: https://risecloud2.onrender.com 
+-Postman Collection: https://documenter.getpostman.com/view/15748545/2s9Y5YSNYg
 ## Features
 
 - User Registration: Users can create accounts with their email address, password, and full name.
