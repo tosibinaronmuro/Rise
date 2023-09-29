@@ -18,7 +18,7 @@ app.use("/api/v1/admin/bucket", adminAuthMiddleware, bucketAdminRouter);
 
 
  app.get('/', (req:Request,res:Response)=>{
-    res.status(200).send('Risecloud api base URL ')
+    res.status(200).send('Risecloud api base URL <br/><a> Postman Collection: https://documenter.getpostman.com/view/15748545/2s9Y5YSNYg <a/>')
  })
 //  app.set("trust proxy", 1);
 //  app.use(
