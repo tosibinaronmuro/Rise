@@ -17,9 +17,10 @@ app.use("/api/v1/bucket", authMiddleware, bucketRouter);
 app.use("/api/v1/admin/bucket", adminAuthMiddleware, bucketAdminRouter);
 
 
- app.get('/', (req:Request,res:Response)=>{
-    res.status(200).send('Risecloud api base URL <br/><a> Postman Collection: https://documenter.getpostman.com/view/15748545/2s9Y5YSNYg <a/>')
- })
+app.get('/', (req: Request, res: Response) => {
+    res.status(200).send('Risecloud API base URL <br/> <a href="https://documenter.getpostman.com/view/15748545/2s9Y5YSNYg">Postman Collection</a>');
+});
+
 //  app.set("trust proxy", 1);
 //  app.use(
 //    rateLimiter({
